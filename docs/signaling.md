@@ -243,7 +243,7 @@ machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and 
 |                 |                                                                                                                  |
 |-----------------|------------------------------------------------------------------------------------------------------------------|
 | **HTTP Method** | `POST`                                                                                                           |
-| **URL Path**    | `/dataflows/{id}/prepare`                                                                                        |
+| **URL Path**    | `/dataflows/prepare`                                                                                             |
 | **Request**     | [`DataFlowPrepareMessage`](#dataflowpreparemessage)                                                              |
 | **Response**    | `HTTP 200` OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
 
@@ -262,7 +262,7 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 |                 |                                                                                                                  |
 |-----------------|------------------------------------------------------------------------------------------------------------------|
 | **HTTP Method** | `POST`                                                                                                           |
-| **URL Path**    | `/dataflows/{id}/start`                                                                                          |
+| **URL Path**    | `/dataflows/:id/start`                                                                                           |
 | **Request**     | [`DataFlowStartMessage`](#dataflowstartmessage)                                                                  |
 | **Response**    | `HTTP 200` OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
 
@@ -277,7 +277,7 @@ The `suspend` request signals to the [=Data Plane=] to suspend a data transfer.
 |                 |                                                     |
 |-----------------|-----------------------------------------------------|
 | **HTTP Method** | `POST`                                              |
-| **URL Path**    | `/dataflows/{id}/suspend`                           |
+| **URL Path**    | `/dataflows/:id/suspend`                            |
 | **Request**     | [`DataFlowSuspendMessage`](#dataflowsuspendmessage) |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`               |
 
@@ -290,7 +290,7 @@ The `terminate` request signals to the [=Data Plane=] to terminate a data transf
 |                 |                                                         |
 |-----------------|---------------------------------------------------------|
 | **HTTP Method** | `POST`                                                  |
-| **URL Path**    | `/dataflows/{id}/terminate`                             |
+| **URL Path**    | `/dataflows/:id/terminate`                              |
 | **Request**     | [`DataFlowTerminateMessage`](#dataflowterminatemessage) |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`                   |
 
@@ -303,7 +303,7 @@ The `status` request returns a representation of the [=Data Flow=].
 |                 |                                                                                                                |
 |-----------------|----------------------------------------------------------------------------------------------------------------|
 | **HTTP Method** | `GET`                                                                                                          |
-| **URL Path**    | `/dataflows/{id}`                                                                                              |
+| **URL Path**    | `/dataflows/:id`                                                                                               |
 | **Request**     | Empty body                                                                                                     |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` with a [`DataFlowStatusResponseMessage`](#dataflowstatusresponsemessage) |
 
@@ -320,7 +320,7 @@ The `prepared` request signals to the [=Control Plane=] that the [=Data Flow=] i
 |                 |                                                       |
 |-----------------|-------------------------------------------------------|
 | **HTTP Method** | `POST`                                                |
-| **URL Path**    | `/transfers/{id}/dataflow/prepared`                   |
+| **URL Path**    | `/transfers/:transferId/dataflow/prepared`            |
 | **Request**     | [`DataFlowResponseMessage`](#dataflowresponsemessage) |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`                 |
 
@@ -331,7 +331,7 @@ The `started` request signals to the [=Control Plane=] that the [=Data Flow=] is
 |                 |                                                       |
 |-----------------|-------------------------------------------------------|
 | **HTTP Method** | `POST`                                                |
-| **URL Path**    | `/transfers/{id}/dataflow/started`                    |
+| **URL Path**    | `/transfers/:transferId/dataflow/started`             |
 | **Request**     | [`DataFlowResponseMessage`](#dataflowresponsemessage) |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`                 |
 
@@ -339,12 +339,12 @@ The `started` request signals to the [=Control Plane=] that the [=Data Flow=] is
 
 The `completed` request signals to the [=Control Plane=] that the [=Data Flow=] is in the COMPLETED state.
 
-|                 |                                       |
-|-----------------|---------------------------------------|
-| **HTTP Method** | `POST`                                |
-| **URL Path**    | `/transfers/{id}/dataflow/completed`  |
-| **Request**     | [`DataFlowCompletedMessage`]          |
-| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
+|                 |                                             |
+|-----------------|---------------------------------------------|
+| **HTTP Method** | `POST`                                      |
+| **URL Path**    | `/transfers/:transferId/dataflow/completed` |
+| **Request**     | [`DataFlowCompletedMessage`]                |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`       |
 
 #### Errored
 
@@ -357,12 +357,12 @@ handled by the [=Data Plane=].
 NOTE see [Terminated Event propagation](https://github.com/Metaform/dataplane-signaling/issues/1) for why a `terminated`
 request does not exist.
 
-|                 |                                       |
-|-----------------|---------------------------------------|
-| **HTTP Method** | `POST`                                |
-| **URL Path**    | `/transfers/{id}/dataflow/errored`    |
-| **Request**     | [`DataFlowErroredMessage`]            |
-| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
+|                 |                                           |
+|-----------------|-------------------------------------------|
+| **HTTP Method** | `POST`                                    |
+| **URL Path**    | `/transfers/:transferId/dataflow/errored` |
+| **Request**     | [`DataFlowErroredMessage`]                |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`     |
 
 ## Data Plane Registration
 
