@@ -262,7 +262,7 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 |                 |                                                                                                                  |
 |-----------------|------------------------------------------------------------------------------------------------------------------|
 | **HTTP Method** | `POST`                                                                                                           |
-| **URL Path**    | `/dataflows/:id/start`                                                                                           |
+| **URL Path**    | `/dataflows/:id/start` OR `/dataflows/start`                                                                                       |
 | **Request**     | [`DataFlowStartMessage`](#dataflowstartmessage)                                                                  |
 | **Response**    | `HTTP 200` OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
 
