@@ -365,6 +365,8 @@ request does not exist.
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`     |
 
 ## Data Plane Registration
+    
+### Data Plane Metadata
 
 TBD - Bidirectional vs. Unidirectional registration (for "sync"-only data planes)
 
