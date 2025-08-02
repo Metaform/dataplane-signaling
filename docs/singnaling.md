@@ -354,7 +354,8 @@ non-recoverable error at the [=Wire Protocol=] layer.
 Note that only terminal, non-recoverable errors should be reported to the [=Control Plane=]. Transient errors should be
 handled by the [=Data Plane=].
 
-NOTE see [Terminated Event propagation](#1-terminated-event-propagation) for why a `terminated` request does not exist.
+NOTE see [Terminated Event propagation](https://github.com/Metaform/dataplane-signaling/issues/1) for why a `terminated`
+request does not exist.
 
 |                 |                                       |
 |-----------------|---------------------------------------|
@@ -382,32 +383,4 @@ need to publish a Wire Protocol Signaling Specification. Define what the specifi
 
 ## Open Issues
 
-### 1. Terminated Event propagation
-
-#### Non-Propagation Case
-
-Provider data plane terminates transfer due to an error. Consumer data plane will receive this at the wire protocol
-level. Provider data plane notifies provider control plane. Provider control plane should not propagate the terminated
-event.
-
-#### Propagation Case
-
-Provider control plane terminates the transfer due to a policy violation. This event should be propagated to the
-consumer control plane. The issue is the consumer data plane may have already propagated the termination to its control
-plane. The two terminations may not be correlatable, and per the DSP spec, the TP cannot transition from TERMINATED to
-TERMINATED.
-
-#### Proposal
-
-Only terminated events due to unexpected wire protocol errors are sent to the control plane, which **does not**
-propagate those to the counter-party. It can be assumed that the counter-party will behave the same way and both TP
-state machines will be consistent.
-
-If one party terminates a data transmission at the wire protocol layer under "normal circumstances" (see below), the
-other data plane should not report that as an error.
-
-Note that each Wire Protocol Signaling Specification will need to define what an abnormal termination is. For example, a
-socket close without a prior terminated message may be interpreted as an error, while a terminated message followed by
-a socket close is not.
-
-Update `errored` request description.
+https://github.com/Metaform/dataplane-signaling/issues
