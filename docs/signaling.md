@@ -11,7 +11,7 @@ The following terms are used to describe concepts in this specification.
 - Connector: Software services that manage the exchange of data between a
   provider and consumer as defined by the DSP Specification.
 - Control Plane: The [=Connector=] services that implement the DSP protocol.
-- Data Flow: The exchange of data belonging to a [=Data Set=] between a provider and consumer [=Data Plane=].
+- Data Flow: The exchange of data belonging to a [=Dataset=] between a provider and consumer [=Data Plane=].
 - Data Plane: The [=Connector=] services that implement a [=Data Flow=] using a [=Wire Protocol=].
 - Dataset: Data or a technical service that can be shared as defined by the DSP Specification.
 - Participant: A dataspace member as defined by the DSP Specification.
