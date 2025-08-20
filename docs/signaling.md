@@ -240,12 +240,12 @@ to PREPARING, the [=Data Plane=] MUST return HTTP 202 Accepted with the `Locatio
 the [data flow status relative URL](#status) and a message body containing a `DataFlowResponseMessage`. If the state
 machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
 
-|                 |                                                                                                                  |
-|-----------------|------------------------------------------------------------------------------------------------------------------|
-| **HTTP Method** | `POST`                                                                                                           |
-| **URL Path**    | `/dataflows/prepare`                                                                                             |
-| **Request**     | [`DataFlowPrepareMessage`](#dataflowpreparemessage)                                                              |
-| **Response**    | `HTTP 200` OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
+|                 |                                                                                                                                                                               |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **HTTP Method** | `POST`                                                                                                                                                                        |
+| **URL Path**    | `/dataflows/prepare`                                                                                                                                                          |
+| **Request**     | [`DataFlowPrepareMessage`](#dataflowpreparemessage)                                                                                                                           |
+| **Response**    | `HTTP 200` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
 
 ##### DataFlowPrepareMessage
 
@@ -259,12 +259,12 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 `DataFlowResponseMessage`. If the state machine transitions to STARTED, the [=Data Plane=] MUST return HTTP 200 OK and a
 `DataFlowResponseMessage`.
 
-|                 |                                                                                                                  |
-|-----------------|------------------------------------------------------------------------------------------------------------------|
-| **HTTP Method** | `POST`                                                                                                           |
-| **URL Path**    | `/dataflows/:id/start` OR `/dataflows/start`                                                                     |
-| **Request**     | [`DataFlowStartMessage`](#dataflowstartmessage)                                                                  |
-| **Response**    | `HTTP 200` OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
+|                 |                                                                                                                                                                               |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **HTTP Method** | `POST`                                                                                                                                                                        |
+| **URL Path**    | `/dataflows/:id/start` OR `/dataflows/start`                                                                                                                                  |
+| **Request**     | [`DataFlowStartMessage`](#dataflowstartmessage)                                                                                                                               |
+| **Response**    | `HTTP 200` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error` |
 
 ##### DataFlowStartMessage
 
@@ -365,7 +365,7 @@ request does not exist.
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`     |
 
 ## Data Plane Registration
-    
+
 ### Data Plane Metadata
 
 TBD - Bidirectional vs. Unidirectional registration (for "sync"-only data planes)
