@@ -364,21 +364,306 @@ request does not exist.
 | **Request**     | [`DataFlowErroredMessage`]                |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`     |
 
-## Data Plane Registration
+## Registration
 
-### Data Plane Metadata
+Registration is the process where a [=Data Plane=] is registered with the [=Control Plane=] and vice versa. Registration
+may be performed through configuration, via an endpoint, or both. This section describes the registration process for
+both [=Data Plane=] and [=Control Plane=] deployments.
 
-TBD - Bidirectional vs. Unidirectional registration (for "sync"-only data planes)
+Registration may be performed multiple times to update information. Updates follow `replace` semantics. Authorization
+key rotation can be achieved by updating registrations.
 
-## Authorization Profiles
+Since the Data Plane Signaling API is bidirectional, security should be enforced on both the [=Control Plane=]
+and [=Data Plane=]. This can be achieved at the networking layer or by using a mutual authorization profile. The
+registration process is designed to convey data required to bootstrap authorization.
 
-### OAuth 2
+Note that the registration process granularity is not defined by this specification and is implementation-specific. For
+example, a registration may be per deployment or per participant in a multi-participant deployment.
 
-TBD
+### Data Plane Registration
+
+Data Plane registration is the process where a [=Data Plane=] is registered with the [=Control Plane=].
+
+#### The Data Plane Registration Type
+
+The data plane registration object contains the following properties:
+
+|              |                                                                                                     |
+|--------------|-----------------------------------------------------------------------------------------------------|
+| **Schema**   | [JSON Schema](./resources/TBD)                                                                      |
+| **Required** | - `endpoint`: The data plane signaling endpoint.                                                    |
+|              | - `transferTypes`: An array of one or more strings corresponding to supported transfer types.       |
+| **Optional** | - `authorization`: an array of one or more authorization objects .                                  |
+|              | - `labels`: an array of one or more strings corresponding to labels associated with the data plane. |
+
+The following is a non-normative example of a Data Plane registration data object:
+
+```json
+{
+  "dataplaneId": "7d6fda82-98b6-4738-a874-1f2c003a79ff",
+  "name": "My Data Plane",
+  "description": "My Data Plane Description",
+  "endpoint": "https://example.com/signaling",
+  "transferTypes": [
+    "com.test.http-pull"
+  ],
+  "authorization": [
+    {
+      "type": "oauth2_client_credentials",
+      "tokenEndpoint": "https://example.com/auth",
+      "clientId": "1234567890",
+      "clientSecret": "1234567890"
+    },
+    {
+      "type": "apikey",
+      "key": "....."
+    }
+  ],
+  "labels": [
+    "label1",
+    "label2"
+  ]
+}
+```
+
+##### Transfer Types
+
+The transfer type scheme is defined as follows:
+
+`[FORWARDTYPE]-[push|pull](-[RESPONSETYPE])`
+
+where:
+
+- `FORWARDTYPE` is the name of the data transfer type. the name should include a qualifier and protocol identifier in
+  the form of `[qualifier].[protocol]`, for example, `com.test.http`. The forward type is case-insensitive and must be
+  unique.
+- `PUSH` or `PULL` indicates whether the data transfer type is push or pull. The type is case-insensitive.
+- `RESPONSETYPE` is optional and indicates whether the data transfer type supports response messages. It is the same
+  format as the `FORWARDTYPE`.
+
+##### Authorization Object
+
+The authorization object contains one mandatory property `type` identifying a supported Authorization Profile and MAY
+contain additional properties specific to the profile.
+
+#### Configuration-based Registration
+
+A [=Control Plane=] implementation MAY support registration through configuration. In this scenario, the way
+configuration is applied is implementation-specific.
+
+#### Endpoint Registration
+
+A [=Control Plane=] implementation MAY support registration through an endpoint. The endpoint is defined as follows:
+
+|                 |                                       |
+|-----------------|---------------------------------------|
+| **HTTP Method** | `POST`                                |
+| **URL Path**    | `/dataplanes/registration`            |
+| **Request**     | [`DataPlaneRegistrationMessage`]      |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
+
+The `DataPlaneRegistrationMessage` adheres to the [Registration type](#the-registration-type) structure. The endpoint
+MAY require an authorization mechanism such as OAuth 2.0 or API Key. This is implementation-specific.
+
+Note that the endpoint is relative and may include additional context information such as a sub-path that indicates a
+participant ID the registration applies to.
+
+TODO: Define DataPlaneRegistrationRegistrationMessage, inlcuding the `dataplaneId` property.
+
+#### Endpoint Update
+
+If the [=Control Plane=] implementation supports endpoint registration, it MUST support endpoint updates. The endpoint
+update is defined as follows:
+
+|                 |                                         |
+|-----------------|-----------------------------------------|
+| **HTTP Method** | `PUT`                                   |
+| **URL Path**    | `/dataplanes/:dataplaneId/registration` |
+| **Request**     | [`DataPlaneRegistrationMessage`]        |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`   |
+
+Update semantics are defined as a `replace` operation.
+
+##### Deletion
+
+If the [=Control Plane=] implementation supports endpoint registration, it MUST support endpoint deletion defined as
+follows:
+
+|                 |                                         |
+|-----------------|-----------------------------------------|
+| **HTTP Method** | `DELETE`                                |
+| **URL Path**    | `/dataplanes/:dataplaneId/registration` |
+| **Response**    | `HTTP 204` OR `HTTP 4xx Client Error`   |
+
+### Control Plane Registration
+
+Control Plane registration is the process where a [=Control Plane=] is registered with the [=Data Plane=].
+
+#### The Control Plane Registration Type
+
+The control plane registration object contains the following properties:
+
+|              |                                                                    |
+|--------------|--------------------------------------------------------------------|
+| **Schema**   | [JSON Schema](./resources/TBD)                                     |
+| **Required** | - `endpoint`: The control plane signaling endpoint.                |
+| **Optional** | - `authorization`: an array of one or more authorization objects . |
+
+The following is a non-normative example of a Control Plane registration data object:
+
+```json
+{
+  "dataplaneId": "bcf2d204-03bc-4354-8e92-b15b68d3c358",
+  "name": "My Control Plane",
+  "description": "My Control Plane Description",
+  "endpoint": "https://example.com/signaling",
+  "authorization": [
+    {
+      "type": "..."
+    }
+  ]
+}
+```
+
+##### Authorization Object
+
+The authorization object contains one mandatory property `type` identifying a supported Authorization Profile and MAY
+contain additional properties specific to the profile.
+
+#### Configuration-based Registration
+
+A [=Data Plane=] implementation MAY support registration through configuration. In this scenario, the way
+configuration is applied is implementation-specific.
+
+#### Endpoint Registration
+
+A [=Data Plane=] implementation MAY support registration through an endpoint. The endpoint is defined as follows:
+
+|                 |                                       |
+|-----------------|---------------------------------------|
+| **HTTP Method** | `POST`                                |
+| **URL Path**    | `/controlplanes/registration`         |
+| **Request**     | [`ControlPlaneRegistrationMessage`]   |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
+
+The `ControlPlaneRegistrationMessage` adheres to the [Registration type](#the-registration-type) structure. The endpoint
+MAY require an authorization mechanism such as OAuth 2.0 or API Key. This is implementation-specific.
+
+Note that the endpoint is relative and may include additional context information such as a sub-path that indicates a
+participant ID the registration applies to.
+
+TODO: Define DataPlaneRegistrationRegistrationMessage, inlcuding the `dataplaneId` property.
+
+#### Endpoint Update
+
+If the [=Data Plane=] implementation supports endpoint registration, it MUST support endpoint updates. The endpoint
+update is defined as follows:
+
+|                 |                                               |
+|-----------------|-----------------------------------------------|
+| **HTTP Method** | `PUT`                                         |
+| **URL Path**    | `/controlplanes/:controlplaneId/registration` |
+| **Request**     | [`ControlPlaneRegistrationMessage`]           |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`         |
+
+Update semantics are defined as a `replace` operation.
+
+##### Deletion
+
+If the [=Data Plane=] implementation supports endpoint registration, it MUST support endpoint deletion defined as
+follows:
+
+|                 |                                               |
+|-----------------|-----------------------------------------------|
+| **HTTP Method** | `DELETE`                                      |
+| **URL Path**    | `/controlplanes/:controlplaneId/registration` |
+| **Response**    | `HTTP 204` OR `HTTP 4xx Client Error`         |
+
+### Authorization Profiles
+
+This section describes two optional profiles that can be used to authorize a [=Data Plane=] or [=Control Plane=]
+registration.
+
+#### OAuth 2 Client Credentials Grant
+
+A [=Control Plane=] or [=Data Plane=] that supports the OAuth 2.0 Client Credentials Grant as is defined
+in [RFC 6749](https://tools.ietf.org/html/rfc6749#section-4.4) includes an `oauth2_client_credentials` authorization
+profile entry in its `authorization` array. This entry contains the following properties:
+
+|              |                                                                                                                                                 |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Schema**   | [JSON Schema](./resources/TBD)                                                                                                                  |
+| **Required** | - `type`: Must be `oauth2_client_credentials`.                                                                                                  |
+|              | - `tokenEndpoint`: The URL of the authorization server's token endpoint as defined in [RFC6749](https://datatracker.ietf.org/doc/html/rfc6749). |
+|              | - `clientId`: The OAuth2 client id used for the Client Credentials Grant.                                                                       |
+|              | - `clientSecret`: The OAuth2 client secret used for the Client Credentials Grant.                                                               |
+
+The following is a non-normative example of an OAuth2 entry:
+
+```json
+{
+  "authorization": [
+    {
+      "type": "oauth2_client_credentials",
+      "tokenEndpoint": "https://example.com/auth",
+      "clientId": "1234567890",
+      "clientSecret": "1234567890"
+    }
+  ]
+}
+```
+
+##### Dynamic Client Registration
+
+TODO Discussion of the control/data plane being a resource server and dynamic client registration.
+
+```mermaid
+sequenceDiagram
+    participant coord as Coordinator
+    participant cidp as Control Plane<br>Authorization Server
+    participant cp as Control Plane
+    participant didp as Data Plane<br>Authorization Server
+    participant dp as Data Plane
+
+    rect rgb(223, 223, 225)
+        coord ->> cidp: OAuth Client Credentials Flow
+        cidp ->> coord: Coord token
+    end
+
+    coord ->> cidp: DCR (using coord token)
+    cidp ->> coord: Access Token
+    coord ->> dp: Register Control Plane (provide DCR-generared Access Token)
+
+    rect rgb(223, 223, 225)
+        coord ->> cidp: OAuth Client Credentials Flow
+        cidp ->> coord: Coord token
+    end
+
+    coord ->> didp: DCR (using coord token)
+    didp ->> coord: Access Token
+    coord ->> cp: Register Data Plane (provide DCR Access Token)
+```           
+
+#### API Key
+
+```json
+{
+  "authorization": [
+    {
+      "type": "apikey",
+      "key": "....."
+    }
+  ]
+}
+```
+
 
 ## Data Transfer Type Registry
 
-Define how data transfer types can be registered with the data Plane Singaling project. One requirement is that they
+************ https://datatracker.ietf.org/doc/html/rfc8414#section-7.1
+************ https://datatracker.ietf.org/doc/rfc9728/ section 8
+
+Define how data transfer types can be registered with the data Plane Signaling project. One requirement is that they
 need to publish a Wire Protocol Signaling Specification. Define what the specification must contain.
 
 ### Wire Protocol Signaling Specification Requirements
