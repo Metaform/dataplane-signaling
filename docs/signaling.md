@@ -17,7 +17,7 @@ The following terms are used to describe concepts in this specification.
 - Participant: A dataspace member as defined by the DSP Specification.
 - Transfer Process: A set of interactions between two connectors that provide access to a dataset as defined by the DSP
   Specification.
-- Wire Protocol: A protocol such as MQTT, AMQP, or HTTP REST API that governs the exchange of data.
+- Wire Protocol: A protocol such as MQTT, AMQP, or an HTTP REST API that governs the exchange of data.
 
 ## Base Concepts
 
@@ -28,8 +28,8 @@ A [=Data Flow=] represents the current state of the physical data transfer.
 
 ### Data Transfer Types
 
-A [=Data Flow=] is one of two data transfer types as defined
-in [DSP Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#data-transfer-types):
+A [=Data Flow=] is one of two data transfer types as defined in the
+[DSP Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#data-transfer-types):
 
 | Push            | Pull              |
 |-----------------|-------------------|
@@ -43,8 +43,8 @@ via a consumer subscriber, or a provider HTTP REST API invoked by a consumer cli
 
 #### Finite vs Non-Finite Data
 
-DSP further
-distinguishes [Finite and Non-Finite Data](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#finite-and-non-finite-data).
+DSP further distinguishes
+[Finite and Non-Finite Data](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#finite-and-non-finite-data).
 Finite data has a demarcated end, for example, a file or set of files. Non-Finite data has no specified end. It could be
 an ongoing event stream or an HTTP REST API.
 
@@ -60,7 +60,7 @@ A [=Data Flow=] is defined as a state machine. [=Data Flow=] state transitions r
 
 ### State Machine Definition
 
-The [=Data Flow=] state machine is defined as follows. An implementation MUST support these transitions:
+The [=Data Flow=] state machine is defined by the following states and transitions, which implementations MUST support:
 
 ```mermaid
 stateDiagram-v2
@@ -101,7 +101,7 @@ the efficient handling of long-running processes. All other transitions MUST be 
 
 ### Synchronous Operation
 
-In many scenarios, a [=Data Plane=] can immediately transition from its INITIAL state to either the STARTED or PREPARED
+In many scenarios, a [=Data Plane=] MAY immediately transition from its INITIAL state to either the STARTED or PREPARED
 state. In these cases, the transitions happen synchronously and can be represented in compact form as follows:
 
 ```mermaid
@@ -409,14 +409,7 @@ The following is a non-normative example of a Data Plane registration data objec
   ],
   "authorization": [
     {
-      "type": "oauth2_client_credentials",
-      "tokenEndpoint": "https://example.com/auth",
-      "clientId": "1234567890",
-      "clientSecret": "1234567890"
-    },
-    {
-      "type": "apikey",
-      "key": "....."
+      "type": "..."
     }
   ],
   "labels": [
@@ -468,7 +461,7 @@ MAY require an authorization mechanism such as OAuth 2.0 or API Key. This is imp
 Note that the endpoint is relative and may include additional context information such as a sub-path that indicates a
 participant ID the registration applies to.
 
-TODO: Define DataPlaneRegistrationRegistrationMessage, inlcuding the `dataplaneId` property.
+TODO: Define DataPlaneRegistrationRegistrationMessage, including the `dataplaneId` property.
 
 #### Endpoint Update
 
@@ -552,7 +545,7 @@ MAY require an authorization mechanism such as OAuth 2.0 or API Key. This is imp
 Note that the endpoint is relative and may include additional context information such as a sub-path that indicates a
 participant ID the registration applies to.
 
-TODO: Define DataPlaneRegistrationRegistrationMessage, inlcuding the `dataplaneId` property.
+TODO: Define DataPlaneRegistrationRegistrationMessage, including the `dataplaneId` property.
 
 #### Endpoint Update
 
@@ -657,11 +650,7 @@ sequenceDiagram
 }
 ```
 
-
 ## Data Transfer Type Registry
-
-************ https://datatracker.ietf.org/doc/html/rfc8414#section-7.1
-************ https://datatracker.ietf.org/doc/rfc9728/ section 8
 
 Define how data transfer types can be registered with the data Plane Signaling project. One requirement is that they
 need to publish a Wire Protocol Signaling Specification. Define what the specification must contain.
