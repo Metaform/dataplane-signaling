@@ -32,7 +32,7 @@ A [=Data Flow=] is one of two data transfer types as defined in the
 [DSP Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#data-transfer-types):
 
 | Push            | Pull              |
-|-----------------|-------------------|
+| --------------- | ----------------- |
 | Client Endpoint | Provider Endpoint |
 
 Examples of push data transfers include an event stream published to a channel supplied by the consumer, or a
@@ -130,7 +130,6 @@ authorization toke. Implementations MUST support `DataAddress` serialization as 
 following is a non-normative example of a `DataAddress`:
 
 ```json
-
 {
   "@type": "DataAddress",
   "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
@@ -148,7 +147,6 @@ following is a non-normative example of a `DataAddress`:
     }
   ]
 }
-
 ```
 
 ### Push Protocol Messaging
@@ -241,7 +239,7 @@ the [data flow status relative URL](#status) and a message body containing a `Da
 machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
 
 |                 |                                                                                                                                                                               |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **HTTP Method** | `POST`                                                                                                                                                                        |
 | **URL Path**    | `/dataflows/prepare`                                                                                                                                                          |
 | **Request**     | [`DataFlowPrepareMessage`](#dataflowpreparemessage)                                                                                                                           |
@@ -249,7 +247,66 @@ machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and 
 
 ##### DataFlowPrepareMessage
 
+|              |                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Schema**   | [JSON Schema](./schemas/DataFlowPrepareMessage.schema.json)                                                                           |
+| **Required** | - `messageId`: A unique identifier for the message.                                                                                   |
+|              | - `participantId`: The participant ID of the sender as specified in the Dataspace Protocol.                                           |
+|              | - `counterPartyId`: The participant ID of the counterparty as specified in the Dataspace Protocol.                                    |
+|              | - `dataspaceContext`: An identifier for the dataspace context for when the data plane is used in multiple data spaces.                |
+|              | - `processId`: The transfer process ID as assigned by the control plane for correlation.                                              |
+|              | - `agreementId`: The contract agreement ID that was negotiated by the control plane.                                                  |
+|              | - `datasetId`: The ID of the dataset in the DCAT Catalog which is to be transferred.                                                  |
+|              | - `callbackAddress`: A URL where the control plane receives callbacks.                                                                |
+|              | - `transferType`: The type of data transfer. See [data transfer types](#data-transfer-types).                                         |
+|              | - `destinationDataAddress`: An object containing information about where the data can be obtained. See [data address](#data-address). |
+
+The following is a non-normative example of a `DataFlowPrepareMessage`:
+
+```json
+{
+  "messageId": "b1d5f9e2-3c4b-4f7a-9c3e-2f1e5d6c7b8a",
+  "participantId": "provider-participant-id",
+  "counterPartyId": "consumer-participant-id",
+  "dataspaceContext": "test-dataspace-context",
+  "processId": "test-transfer-process-id",
+  "agreementId": "test-agreement-id",
+  "datasetId": "asset-id",
+  "callbackAddress": "https://example.com/provider/callback",
+  "transferType": {
+    "destinationType": "com.test.http",
+    "flowtype": "PULL"
+  },
+  "destinationDataAddress": {
+    "type": "https://w3id.org/idsa/v4.1/HTTP",
+    "endpoint": "http://dataplane.provider.com/api/public",
+    "authType": "bearer",
+    "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
+    "authorization": "<AUTH_TOKEN>"
+  }
+}
+```
+
 ##### DataFlowResponseMessage
+
+|              |                                                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Schema**   | [JSON Schema](./schemas/DataFlowResponseMessage.schema.json)                                                               |
+| **Required** | - `dataplaneId`: The unique identifier of the data plane.                                                                  |
+|              | - `state`: The current state of the data flow.                                                                             |
+| **Optional** | - `dataAddress`: An object containing information about where the data can be obtained. See [data address](#data-address). |
+|              | - `error`: A description of any error that occurred during processing.                                                     |
+
+The following is a non-normative example of a `DataFlowResponseMessage`:
+
+```json
+{
+  "dataplaneId": "ha-dataplane-123",
+  "dataAddress": {},
+  "state": "PREPARED",
+  "error": ""
+}
+```
 
 #### Start
 
@@ -260,7 +317,7 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 `DataFlowResponseMessage`.
 
 |                 |                                                                                                                                                                               |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **HTTP Method** | `POST`                                                                                                                                                                        |
 | **URL Path**    | `/dataflows/:id/start` OR `/dataflows/start`                                                                                                                                  |
 | **Request**     | [`DataFlowStartMessage`](#dataflowstartmessage)                                                                                                                               |
@@ -268,14 +325,61 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 
 ##### DataFlowStartMessage
 
-##### DataFlowResponseMessage
+|              |                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Schema**   | [JSON Schema](./schemas/DataFlowStartMessage.schema.json)                                                                             |
+| **Required** | - `messageId`: A unique identifier for the message.                                                                                   |
+|              | - `participantId`: The participant ID of the sender as specified in the Dataspace Protocol.                                           |
+|              | - `counterPartyId`: The participant ID of the counterparty as specified in the Dataspace Protocol.                                    |
+|              | - `dataspaceContext`: An identifier for the dataspace context for when the data plane is used in multiple data spaces.                |
+|              | - `processId`: The transfer process ID as assigned by the control plane for correlation.                                              |
+|              | - `agreementId`: The contract agreement ID that was negotiated by the control plane.                                                  |
+|              | - `datasetId`: The ID of the dataset in the DCAT Catalog which is to be transferred.                                                  |
+|              | - `callbackAddress`: A URL where the control plane receives callbacks.                                                                |
+|              | - `transferType`: The type of data transfer. See [data transfer types](#data-transfer-types).                                         |
+|              | - `destinationDataAddress`: An object containing information about where the data can be obtained. See [data address](#data-address). |
+|              | - `sourceDataAddress`: An object containing information about where is physically located. See [data address](#data-address).         |
+
+The following is a non-normative example of a `DataFlowStartMessage` where the data is located in an internal API of the
+provider and must be accessed by the provider data plane using an API Key:
+
+```json
+{
+  "messageId": "b1d5f9e2-3c4b-4f7a-9c3e-2f1e5d6c7b8a",
+  "participantId": "provider-participant-id",
+  "counterPartyId": "consumer-participant-id",
+  "dataspaceContext": "test-dataspace-context",
+  "processId": "test-transfer-process-id",
+  "agreementId": "test-agreement-id",
+  "datasetId": "asset-id",
+  "callbackAddress": "https://example.com/provider/callback",
+  "transferType": {
+    "destinationType": "com.test.http",
+    "flowtype": "PULL"
+  },
+  "destinationDataAddress": {
+    "type": "https://w3id.org/idsa/v4.1/HTTP",
+    "endpoint": "http://dataplane.provider.com/api/public",
+    "authType": "bearer",
+    "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
+    "authorization": "<AUTH_TOKEN>"
+  },
+  "sourceDataAddress": {
+    "type": "https://w3id.org/idsa/v4.1/HTTP",
+    "endpoint": "http://internal.provider.com/api/public",
+    "authType": "api-key",
+    "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
+    "authorization": "<API_KEY>"
+  }
+}
+```
 
 #### Suspend
 
 The `suspend` request signals to the [=Data Plane=] to suspend a data transfer.
 
 |                 |                                                     |
-|-----------------|-----------------------------------------------------|
+| --------------- | --------------------------------------------------- |
 | **HTTP Method** | `POST`                                              |
 | **URL Path**    | `/dataflows/:id/suspend`                            |
 | **Request**     | [`DataFlowSuspendMessage`](#dataflowsuspendmessage) |
@@ -283,12 +387,25 @@ The `suspend` request signals to the [=Data Plane=] to suspend a data transfer.
 
 ##### DataFlowSuspendMessage
 
+|              |                                                                       |
+| ------------ | --------------------------------------------------------------------- |
+| **Schema**   | [JSON Schema](./schemas/DataFlowSuspendMessage.schema.json)           |
+| **Optional** | - `reason`: A description of the reason for suspending the data flow. |
+
+The following is a non-normative example of a `DataFlowSuspendMessage`:
+
+```json
+{
+  "reason": "Suspending data flow due to scheduled maintenance."
+}
+```
+
 #### Terminate
 
 The `terminate` request signals to the [=Data Plane=] to terminate a data transfer.
 
 |                 |                                                         |
-|-----------------|---------------------------------------------------------|
+| --------------- | ------------------------------------------------------- |
 | **HTTP Method** | `POST`                                                  |
 | **URL Path**    | `/dataflows/:id/terminate`                              |
 | **Request**     | [`DataFlowTerminateMessage`](#dataflowterminatemessage) |
@@ -296,18 +413,46 @@ The `terminate` request signals to the [=Data Plane=] to terminate a data transf
 
 ##### DataFlowTerminateMessage
 
+|              |                                                                        |
+| ------------ | ---------------------------------------------------------------------- |
+| **Schema**   | [JSON Schema](./schemas/DataFlowTerminateMessage.schema.json)          |
+| **Optional** | - `reason`: A description of the reason for terminating the data flow. |
+
+The following is a non-normative example of a `DataFlowTerminateMessage`:
+
+```json
+{
+  "reason": "Terminating data flow due to an unrecoverable error."
+}
+```
+
 #### Status
 
 The `status` request returns a representation of the [=Data Flow=].
 
 |                 |                                                                                                                |
-|-----------------|----------------------------------------------------------------------------------------------------------------|
+| --------------- | -------------------------------------------------------------------------------------------------------------- |
 | **HTTP Method** | `GET`                                                                                                          |
 | **URL Path**    | `/dataflows/:id`                                                                                               |
 | **Request**     | Empty body                                                                                                     |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` with a [`DataFlowStatusResponseMessage`](#dataflowstatusresponsemessage) |
 
 ##### DataFlowStatusResponseMessage
+
+|              |                                                                    |
+| ------------ | ------------------------------------------------------------------ |
+| **Schema**   | [JSON Schema](./schemas/DataFlowStatusResponseMessage.schema.json) |
+| **Required** | - `dataflowId`: The unique identifier of the data flow.            |
+|              | - `state`: The current state of the data flow.                     |
+
+The following is a non-normative example of a `DataFlowStatusResponseMessage`:
+
+```json
+{
+  "dataflowId": "dataflow-123",
+  "state": "STARTED"
+}
+```
 
 ### Control Plane Endpoint
 
@@ -318,7 +463,7 @@ The Control Plane Endpoint is used by the [=Data Plane=] to make state transitio
 The `prepared` request signals to the [=Control Plane=] that the [=Data Flow=] is in the PREPARED state.
 
 |                 |                                                       |
-|-----------------|-------------------------------------------------------|
+| --------------- | ----------------------------------------------------- |
 | **HTTP Method** | `POST`                                                |
 | **URL Path**    | `/transfers/:transferId/dataflow/prepared`            |
 | **Request**     | [`DataFlowResponseMessage`](#dataflowresponsemessage) |
@@ -329,7 +474,7 @@ The `prepared` request signals to the [=Control Plane=] that the [=Data Flow=] i
 The `started` request signals to the [=Control Plane=] that the [=Data Flow=] is in the STARTED state.
 
 |                 |                                                       |
-|-----------------|-------------------------------------------------------|
+| --------------- | ----------------------------------------------------- |
 | **HTTP Method** | `POST`                                                |
 | **URL Path**    | `/transfers/:transferId/dataflow/started`             |
 | **Request**     | [`DataFlowResponseMessage`](#dataflowresponsemessage) |
@@ -340,7 +485,7 @@ The `started` request signals to the [=Control Plane=] that the [=Data Flow=] is
 The `completed` request signals to the [=Control Plane=] that the [=Data Flow=] is in the COMPLETED state.
 
 |                 |                                             |
-|-----------------|---------------------------------------------|
+| --------------- | ------------------------------------------- |
 | **HTTP Method** | `POST`                                      |
 | **URL Path**    | `/transfers/:transferId/dataflow/completed` |
 | **Request**     | [`DataFlowCompletedMessage`]                |
@@ -358,7 +503,7 @@ NOTE see [Terminated Event propagation](https://github.com/Metaform/dataplane-si
 request does not exist.
 
 |                 |                                           |
-|-----------------|-------------------------------------------|
+| --------------- | ----------------------------------------- |
 | **HTTP Method** | `POST`                                    |
 | **URL Path**    | `/transfers/:transferId/dataflow/errored` |
 | **Request**     | [`DataFlowErroredMessage`]                |
@@ -389,7 +534,7 @@ Data Plane registration is the process where a [=Data Plane=] is registered with
 The data plane registration object contains the following properties:
 
 |              |                                                                                                     |
-|--------------|-----------------------------------------------------------------------------------------------------|
+| ------------ | --------------------------------------------------------------------------------------------------- |
 | **Schema**   | [JSON Schema](./resources/TBD)                                                                      |
 | **Required** | - `endpoint`: The data plane signaling endpoint.                                                    |
 |              | - `transferTypes`: An array of one or more strings corresponding to supported transfer types.       |
@@ -449,13 +594,13 @@ configuration is applied is implementation-specific.
 A [=Control Plane=] implementation MAY support registration through an endpoint. The endpoint is defined as follows:
 
 |                 |                                       |
-|-----------------|---------------------------------------|
+| --------------- | ------------------------------------- |
 | **HTTP Method** | `POST`                                |
 | **URL Path**    | `/dataplanes/registration`            |
 | **Request**     | [`DataPlaneRegistrationMessage`]      |
 | **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
 
-The `DataPlaneRegistrationMessage` adheres to the [Registration type](#the-registration-type) structure. The endpoint
+The `DataPlaneRegistrationMessage` adheres to the [Registration type](#the-data-plane-registration-type) structure. The endpoint
 MAY require an authorization mechanism such as OAuth 2.0 or API Key. This is implementation-specific.
 
 Note that the endpoint is relative and may include additional context information such as a sub-path that indicates a
@@ -469,7 +614,7 @@ If the [=Control Plane=] implementation supports endpoint registration, it MUST 
 update is defined as follows:
 
 |                 |                                         |
-|-----------------|-----------------------------------------|
+| --------------- | --------------------------------------- |
 | **HTTP Method** | `PUT`                                   |
 | **URL Path**    | `/dataplanes/:dataplaneId/registration` |
 | **Request**     | [`DataPlaneRegistrationMessage`]        |
@@ -483,7 +628,7 @@ If the [=Control Plane=] implementation supports endpoint registration, it MUST 
 follows:
 
 |                 |                                         |
-|-----------------|-----------------------------------------|
+| --------------- | --------------------------------------- |
 | **HTTP Method** | `DELETE`                                |
 | **URL Path**    | `/dataplanes/:dataplaneId/registration` |
 | **Response**    | `HTTP 204` OR `HTTP 4xx Client Error`   |
@@ -497,7 +642,7 @@ Control Plane registration is the process where a [=Control Plane=] is registere
 The control plane registration object contains the following properties:
 
 |              |                                                                    |
-|--------------|--------------------------------------------------------------------|
+| ------------ | ------------------------------------------------------------------ |
 | **Schema**   | [JSON Schema](./resources/TBD)                                     |
 | **Required** | - `endpoint`: The control plane signaling endpoint.                |
 | **Optional** | - `authorization`: an array of one or more authorization objects . |
@@ -533,7 +678,7 @@ configuration is applied is implementation-specific.
 A [=Data Plane=] implementation MAY support registration through an endpoint. The endpoint is defined as follows:
 
 |                 |                                       |
-|-----------------|---------------------------------------|
+| --------------- | ------------------------------------- |
 | **HTTP Method** | `POST`                                |
 | **URL Path**    | `/controlplanes/registration`         |
 | **Request**     | [`ControlPlaneRegistrationMessage`]   |
@@ -553,7 +698,7 @@ If the [=Data Plane=] implementation supports endpoint registration, it MUST sup
 update is defined as follows:
 
 |                 |                                               |
-|-----------------|-----------------------------------------------|
+| --------------- | --------------------------------------------- |
 | **HTTP Method** | `PUT`                                         |
 | **URL Path**    | `/controlplanes/:controlplaneId/registration` |
 | **Request**     | [`ControlPlaneRegistrationMessage`]           |
@@ -567,7 +712,7 @@ If the [=Data Plane=] implementation supports endpoint registration, it MUST sup
 follows:
 
 |                 |                                               |
-|-----------------|-----------------------------------------------|
+| --------------- | --------------------------------------------- |
 | **HTTP Method** | `DELETE`                                      |
 | **URL Path**    | `/controlplanes/:controlplaneId/registration` |
 | **Response**    | `HTTP 204` OR `HTTP 4xx Client Error`         |
@@ -584,7 +729,7 @@ in [RFC 6749](https://tools.ietf.org/html/rfc6749#section-4.4) includes an `oaut
 profile entry in its `authorization` array. This entry contains the following properties:
 
 |              |                                                                                                                                                 |
-|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Schema**   | [JSON Schema](./resources/TBD)                                                                                                                  |
 | **Required** | - `type`: Must be `oauth2_client_credentials`.                                                                                                  |
 |              | - `tokenEndpoint`: The URL of the authorization server's token endpoint as defined in [RFC6749](https://datatracker.ietf.org/doc/html/rfc6749). |
@@ -635,7 +780,7 @@ sequenceDiagram
     coord ->> didp: DCR (using coord token)
     didp ->> coord: Access Token
     coord ->> cp: Register Data Plane (provide DCR Access Token)
-```           
+```
 
 #### API Key
 

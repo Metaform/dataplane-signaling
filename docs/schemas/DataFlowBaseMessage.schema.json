@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DataFlowBaseMessage",
+    "type": "object",
+    "properties": {
+        "messageId": {
+            "type": "string",
+            "description": "Unique identifier for the message"
+        },
+        "participantId": {
+            "type": "string",
+            "description": "ID of the participant sending the message"
+        },
+        "counterPartyId": {
+            "type": "string",
+            "description": "ID of the counterparty"
+        },
+        "dataspceContext": {
+            "type": "string",
+            "description": "Context identifier of the dataspace"
+        },
+        "processId": {
+            "type": "string",
+            "description": "Associated process identifier. This should be the transfer process ID."
+        },
+        "agreementId": {
+            "type": "string",
+            "description": "Contract Agreement identifier"
+        },
+        "datasetId": {
+            "type": "string",
+            "description": "Dataset identifier. This should be identical to the @id of the dcat:dataset"
+        },
+        "callbackAddress": {
+            "type": "string",
+            "format": "uri",
+            "description": "Callback URL as a string"
+        },
+        "transferType": {
+            "type": "object",
+            "properties": {
+                "destinationType": {
+                    "type": "string"
+                },
+                "flowType": {
+                    "type": "string",
+                    "enum": [
+                        "pull",
+                        "push"
+                    ]
+                }
+            },
+            "required": [
+                "destinationType",
+                "flowType"
+            ]
+        },
+        "destinationDataAddress": {
+            "type": "object"
+        }
+    },
+    "required": [
+        "messageId",
+        "participantId",
+        "counterPartyId",
+        "dataspceContext",
+        "processId",
+        "agreementId",
+        "datasetId",
+        "transferType",
+        "destinationDataAddress"
+    ]
+}
