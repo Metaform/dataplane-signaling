@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "DataFlowStatusResponseMessage.json",
+    "title": "DataFlowStatusResponseMessage",
+    "type": "object",
+    "properties": {
+        "state": {
+            "type": "string",
+            "enum": [
+                "UNINITIALIZED",
+                "PREPARING",
+                "PREPARED",
+                "STARTING",
+                "STARTED",
+                "COMPLETED",
+                "SUSPENDED",
+                "TERMINATED"
+            ],
+            "description": "The current state of the data flow"
+        },
+        "dataFlowId": {
+            "type": "string",
+            "description": "The unique identifier of the data flow"
+        }
+    },
+    "required": [
+        "state",
+        "dataFlowId"
+    ]
+}

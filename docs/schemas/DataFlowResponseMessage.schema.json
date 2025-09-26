@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "DataFlowResponseMessage.json",
+    "title": "DataFlowResponseMessage",
+    "type": "object",
+    "properties": {
+        "dataplaneId": {
+            "type": "string"
+        },
+        "dataAddress": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "state": {
+            "type": "string",
+            "enum": [
+                "UNINITIALIZED",
+                "PREPARING",
+                "PREPARED",
+                "STARTING",
+                "STARTED",
+                "COMPLETED",
+                "SUSPENDED",
+                "TERMINATED"
+            ]
+        },
+        "error": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "dataplaneId",
+        "state"
+    ]
+}
