@@ -1,0 +1,879 @@
+openapi: 3.0.2
+servers:
+  - url: https://example.com/signaling/v1
+info:
+  description: |-
+    This specification contains all mandatory and optional endpoints for the [Dataplane Signaling Protocol (DPS)](https://github.com/Metaform/dataplane-signaling/blob/main/docs/signaling.md).
+    It is based on OpenAPI 3.0.2 and uses JSON Schema for data modeling.
+  version: 0.0.1
+  title: Dataplane Signaling Protocol DPS
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Data plane endpoints
+    description: Endpoints that must be implemented by the data plane
+    externalDocs:
+      description: Find out more
+      url: 'https://github.com/Metaform/dataplane-signaling/blob/main/docs/signaling.md#data-plane-endpoint'
+  - name: Control plane endpoints
+    description: All endpoints that must be implemented by the control plane
+    externalDocs:
+      description: Find out more about our store
+      url: 'https://github.com/Metaform/dataplane-signaling/blob/main/docs/signaling.md#control-plane-endpoint'
+  - name: Data Plane Registration
+    description: Data plane registration endpoints, to be implemented by the control plane. Note that these endpoints are OPTIONAL, but either NONE or ALL must be implemented.
+  - name: Control Plane Registration
+    description: Control plane registration endpoints, to be implemented by the data plane. Note that these endpoints are OPTIONAL, but either NONE or ALL must be implemented.
+paths:
+  /dataflows/prepare:
+    post:
+      tags:
+        - Data plane endpoints
+      summary: Prepare a dataflow
+      description: |
+        The prepare request signals to the dat plane to initialize a data flow and any resources required for data transfer. 
+        The request results in a state machine transition to PREPARING or PREPARED. If the state machine transitions to PREPARING, the 
+        data plane returns HTTP 202 with the `Location` header set to the relative URL where the status of the data flow can be polled 
+        and a response body containing a DataFlowResponseMessage. If the state machine transitions to PREPARED, the data plane returns HTTP 200 
+        and a DataFlowResponseMessage.
+      operationId: prepareDataflow
+      responses:
+        '200':
+          description: Dataflow prepared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                dataplaneId: dataplane-64345
+                state: PREPARED
+        '202':
+          description: Request received, dataflow preparation in progress
+          headers:
+            Location:
+              description: URL to poll for dataflow status
+              schema:
+                type: string
+                format: uri
+              example: /dataflows/flow-1234/status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                dataplaneId: dataplane-64345
+                state: PREPARING
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+      requestBody:
+        description: Dataflow preparation request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowPrepareMessage'
+
+  /dataflows/{id}/start:
+    post:
+      tags:
+        - Data plane endpoints
+      summary: Start a dataflow
+      description: |
+        The start request signals to the data plane to begin a data transfer. The request results in a state machine 
+        transition to STARTING or STARTED. If the state machine transitions to STARTING, the data plane MUST return 
+        HTTP 202 Accepted with the Location header set to the data flow status relative URL and a message body containing 
+        a DataFlowResponseMessage. If the state machine transitions to STARTED, the data plane MUST return 
+        HTTP 200 OK and a DataFlowResponseMessage.
+
+      operationId: startDataflowById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the data flow to start
+          schema:
+            type: string
+            example: flow-1234
+      responses:
+        '200':
+          description: Dataflow started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                example:
+                  dataplaneId: dataplane-64345
+                  state: STARTED
+                  dataAddress:
+                    '@type': DataAddress
+                    endpointType: https://23id.org.idsa/v4.1/HTTP
+                    endpoint: https://example.com/api/data
+                    endpointProperties:
+                      - '@type': EndpointProperty
+                        name: authorization
+                        value: 5up3r53cur3t0k3n
+                      - '@type': EndpointProperty
+                        name: authType
+                        value: bearer
+        '202':
+          description: Start request received, dataflow is being started
+          headers:
+            Location:
+              description: The URL to retrieve the data flow status
+              schema:
+                type: string
+                format: uri
+              example: /dataflows/flow-1234/status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                example:
+                  dataplaneId: dataplane-64345
+                  state: STARTING
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data flow with specified ID does not exist
+
+  /dataflows/start:
+    post:
+      tags:
+        - Data plane endpoints
+      summary: Start a dataflow
+      description: |
+        The start request signals to the data plane to begin a data transfer. The request results in a state machine 
+        transition to STARTING or STARTED. If the state machine transitions to STARTING, the data plane MUST return 
+        HTTP 202 Accepted with the Location header set to the data flow status relative URL and a message body containing 
+        a DataFlowResponseMessage. If the state machine transitions to STARTED, the data plane MUST return 
+        HTTP 200 OK and a DataFlowResponseMessage.
+      operationId: startDataflow
+      requestBody:
+        description: Dataflow start request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowStartMessage'
+
+      responses:
+        '200':
+          description: Dataflow started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                dataplaneId: dataplane-64345
+                state: STARTED
+                dataAddress:
+                  '@type': DataAddress
+                  endpointType: https://23id.org.idsa/v4.1/HTTP
+                  endpoint: https://example.com/api/data
+                  endpointProperties:
+                    - '@type': EndpointProperty
+                      name: authorization
+                      value: 5up3r53cur3t0k3n
+                    - '@type': EndpointProperty
+                      name: authType
+                      value: bearer
+        '202':
+          description: Start request received, dataflow is being started
+          headers:
+            Location:
+              description: The URL to retrieve the data flow status
+              schema:
+                type: string
+                format: uri
+              example: /dataflows/flow-1234/status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowResponseMessage'
+              example:
+                example:
+                  dataplaneId: dataplane-64345
+                  state: STARTING
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data flow with specified ID does not exist
+
+  /dataflows/{id}/suspend:
+    post:
+      tags:
+        - Data plane endpoints
+      summary: Suspend a dataflow
+      description: |
+        The suspend request signals to the data plane to suspend an ongoing data transfer.
+      operationId: suspendDataflowById
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowSuspendMessage'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the data flow to suspend
+          schema:
+            type: string
+            example: flow-1234
+      responses:
+        '200':
+          description: Dataflow suspended successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data flow with specified ID does not exist
+
+  /dataflows/{id}/terminate:
+    post:
+      tags:
+        - Data plane endpoints
+      summary: Terminate a dataflow
+      description: |
+        The terminate request signals to the data plane to terminate an ongoing data transfer.
+      operationId: terminateDataflowById
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowTerminateMessage'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the data flow to terminate
+          schema:
+            type: string
+            example: flow-1234
+      responses:
+        '200':
+          description: Dataflow terminated successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data flow with specified ID does not exist
+
+  /dataflows/{id}/status:
+    get:
+      tags:
+        - Data plane endpoints
+      summary: Get the status of a dataflow
+      description: |
+        The status endpoint returns a representation of the data flow as managed by the data plane
+      operationId: getDataflowStatusById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique identifier of the data flow to retrieve the status for
+          schema:
+            type: string
+            example: flow-1234
+      responses:
+        '200':
+          description: Dataflow status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataFlowStatusResponseMessage'
+              example:
+                dataplaneId: dataplane-64345
+                state: PREPARING
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data flow with specified ID does not exist
+
+  /transfers/{transferId}/dataflow/prepared:
+    post:
+      tags:
+        - Control plane endpoints
+      summary: Signals the PREPARED state
+      description: |
+        The prepared request signals to the control plane that the data plane is in the PREPARED state and ready to start a data transfer
+      operationId: signalPrepared
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          description: the unique identifier of the data transfer (= data flow)
+          schema:
+            type: string
+            example: 93a78371-7891-495e-afb5-9b11ac6b1e94
+      requestBody:
+        description: Dataflow prepared notification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowResponseMessage'
+            example:
+              dataplaneId: dataplane-64345
+              state: PREPARED
+      responses:
+        '200':
+          description: Notification received successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - transfer process with specified ID does not exist
+
+  /transfers/{transferId}/dataflow/started:
+    post:
+      tags:
+        - Control plane endpoints
+      summary: Signals the STARTED state
+      description: |
+        The started request signals to the control plane that the data plane is in the STARTED state and clients can start transmitting data
+      operationId: signalStarted
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          description: the unique identifier of the data transfer (= data flow)
+          schema:
+            type: string
+            example: 93a78371-7891-495e-afb5-9b11ac6b1e94
+      requestBody:
+        description: Dataflow started notification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowResponseMessage'
+            example:
+              dataplaneId: dataplane-64345
+              state: STARTED
+      responses:
+        '200':
+          description: Notification received successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - transfer process with specified ID does not exist
+
+  /transfers/{transferId}/dataflow/completed:
+    post:
+      tags:
+        - Control plane endpoints
+      summary: Signals the COMPLETED state
+      description: |
+        The completed request signals to the control plane that the data plane is in the COMPLETED state and all transmissions have finished normally.
+      operationId: signalCompleted
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          description: the unique identifier of the data transfer (= data flow)
+          schema:
+            type: string
+            example: 93a78371-7891-495e-afb5-9b11ac6b1e94
+      requestBody:
+        description: Dataflow completed notification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowResponseMessage'
+            example:
+              dataplaneId: dataplane-64345
+              state: COMPLETED
+      responses:
+        '200':
+          description: Notification received successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - transfer process with specified ID does not exist
+
+  /transfers/{transferId}/dataflow/errored:
+    post:
+      tags:
+        - Control plane endpoints
+      summary: Signals the TERMINATED state
+      description: |
+        The prepared request signals to the control plane that the data plane is in the TERMINATED state which indicates abnormal termination.
+      operationId: signalTerminated
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          description: the unique identifier of the data transfer (= data flow)
+          schema:
+            type: string
+            example: 93a78371-7891-495e-afb5-9b11ac6b1e94
+      requestBody:
+        description: Dataflow terminated notification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowResponseMessage'
+            example:
+              dataplaneId: dataplane-64345
+              state: TERMINATED
+      responses:
+        '200':
+          description: Notification received successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - transfer process with specified ID does not exist
+
+  /dataplanes/register:
+    post:
+      tags:
+        - Data Plane Registration
+      summary: Register a data plane with a control plane.
+      description: |
+        The register endpoint is hosted on the control plane, and may be used to register a data plane with the control plane.
+      operationId: registerDataplane
+      requestBody:
+        description: Data plane registration data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataPlaneRegistrationData'
+      responses:
+        '200':
+          description: Data plane registered successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+
+  /dataplanes/{dataplaneId}/registration:
+    put:
+        tags:
+            - Data Plane Registration
+        summary: Update a data plane registration with replace semantics
+        description: |
+            The registration endpoint is hosted on the control plane, and may be used to update an existing data plane registration, fully replacing the existing one.
+        operationId: updateDataplaneRegistration
+        parameters:
+            - name: dataplaneId
+              in: path
+              required: true
+              description: The unique identifier of the data plane to update
+              schema:
+                  type: string
+                  example: dataplane-64345
+        requestBody:
+            description: Updated data plane registration data
+            required: true
+            content:
+              application/json:
+                  schema:
+                    $ref: '#/components/schemas/DataPlaneRegistrationData'
+        responses:
+            '200':
+              description: Data plane registration updated successfully
+            '400':
+              description: Bad Request - invalid input, invalid object state or missing required parameters
+            '404':
+              description: Not Found - data plane with specified ID does not exist
+
+    delete:
+      tags:
+        - Data Plane Registration
+      summary: Delete a data plane registration
+      operationId: deleteDataplaneRegistration
+      parameters:
+        - name: dataplaneId
+          in: path
+          required: true
+          description: The unique identifier of the data plane to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Data plane registration deleted successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data plane with specified ID does not exist
+          
+  /controlplanes/register:
+    post:
+      tags:
+        - Control Plane Registration
+      summary: Register a control plane with a data plane.
+      description: |
+        The register endpoint is hosted on the data plane, and may be used to register a control plane with the data plane.
+      operationId: registerControlPlane
+      requestBody: 
+        description: Control plane registration data
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlPlaneRegistrationData'
+      responses:
+        '200':
+          description: Control plane registered successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+  
+  /controlplanes/{controlplaneId}/registration:
+    put:
+      tags:
+        - Control Plane Registration
+      summary: Update a control plane registration with replace semantics
+      description: |
+        The registration endpoint is hosted on the data plane, and may be used to update an existing control plane registration, fully replacing the existing one.
+      operationId: updateControlplaneRegistration
+      parameters:
+        - name: controlplaneId
+          in: path
+          required: true
+          description: The unique identifier of the control plane to update
+          schema:
+            type: string
+            example: control-64345
+      requestBody:
+        description: Updated control plane registration data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlPlaneRegistrationData'
+      responses:
+        '200':
+          description: Control plane registration updated successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data plane with specified ID does not exist
+    
+    delete:
+      tags:
+        - Control Plane Registration
+      summary: Delete a control plane registration
+      operationId: deleteControlplaneRegistration
+      parameters:
+        - name: controlplaneId
+          in: path
+          required: true
+          description: The unique identifier of the control plane to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Control plane registration deleted successfully
+        '400':
+          description: Bad Request - invalid input, invalid object state or missing required parameters
+        '404':
+          description: Not Found - data plane with specified ID does not exist
+    
+
+externalDocs:
+  description: Find out more about Dataplane Signaling Protocol
+  url: 'https://github.com/Metaform/dataplane-signaling/blob/main/docs/signaling.md'
+
+components:
+  schemas:
+    DataFlowBaseMessage:
+      type: object
+      required: [ messageId, participantId, counterPartyId, dataspaceContext, processId, agreementId, datasetId, callbackAddress, transferType, destinationDataAddress ]
+      properties:
+        messageId:
+          type: string
+          description: Unique identifier for the message
+          example: msg-123
+        participantId:
+          type: string
+          description: The participant ID of the sender as specified in the Dataspace Protocol
+          example: did:web:some-company.com:participants:9cc38260-2644-4f76-8da3-3df675d506a2
+        counterPartyId:
+          type: string
+          description: The participant ID of the counterparty as specified in the Dataspace Protocol
+          example: did:web:other-company.com:participants:fc639528-1ece-4164-a49c-a84b59ae18b2
+        dataspaceContext:
+          type: string
+          description: An identifier for the dataspace context when the data plane is used in multiple data spaces.
+          example: some-dataspace-context-123
+        processId:
+          type: string
+          description: The transfer process ID as assigned by the control plane for correlation
+          example: 545fc6b6-7b1b-47ca-86f7-9ac43c480de6
+        agreementId:
+          type: string
+          description: The contract agreement ID that was negotiated by the control plane
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        datasetId:
+          type: string
+          description: The ID of the dataset in the DCAT Catalog which is to be transferred
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        callbackAddress:
+          type: string
+          description: The callback address URL of the control plane where it expects status updates.
+          example: https://example.com/controlplanes/xyz/callback
+          format: uri
+        transferType:
+          $ref: '#/components/schemas/TransferType'
+        destinationDataAddress:
+          $ref: '#/components/schemas/DataAddress'
+    DataFlowPrepareMessage:
+      allOf:
+        - $ref: '#/components/schemas/DataFlowBaseMessage'
+
+    DataFlowStartMessage:
+      allOf:
+        - $ref: '#/components/schemas/DataFlowBaseMessage'
+        - type: object
+          required: [ dataFlowId ]
+          properties:
+            sourceDataAddress:
+              $ref: '#/components/schemas/DataAddress'
+
+    DataFlowSuspendMessage:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: An arbitrary string indicating the reason for suspending the data flow.
+          example: "Suspending due to maintenance window."
+
+    DataFlowTerminateMessage:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: An arbitrary string indicating the reason for terminating the data flow.
+          example: "Data source permanently offline."
+
+    DataFlowResponseMessage:
+      type: object
+      required: [ dataplaneId, state ]
+      properties:
+        dataplaneId:
+          type: string
+          description: The unique identifier of the data plane
+          example: dataplane-64345
+        state:
+          type: string
+          description: The state of the data flow. Only PREPARING and PREPARED are valid in the response to a prepare request.
+          enum: [ UNINITIALIZED, PREPARING, PREPARED, STARTING, STARTED, COMPLETED, SUSPENDED, TERMINATED ]
+          example: PREPARED
+        dataAddress:
+          $ref: '#/components/schemas/DataAddress'
+
+        error:
+          type: string
+          description: An error message, if any error occurred during the preparation of the data flow.
+
+    DataFlowStatusResponseMessage:
+      type: object
+      required: [ dataflowId, state ]
+      properties:
+        dataflowId:
+          type: string
+          description: The unique identifier of the data flow
+          example: dataflow-64345
+        state:
+          type: string
+          description: The current state of the data flow.
+          enum: [ UNINITIALIZED, PREPARING, PREPARED, STARTING, STARTED, COMPLETED, SUSPENDED, TERMINATED ]
+
+    DataAddress:
+      type: object
+      required:
+        - type
+        - endpointType
+        - endpoint
+        - endpointProperties
+      properties:
+        '@type':
+          type: string
+          description: The type of data address
+          example: DataAddress
+        endpointType:
+          type: string
+          description: the type of endpoint, indicating the protocol to be used
+          example: https://23id.org.idsa/v4.1/HTTP
+        endpoint:
+          type: string
+          description: The network location of the endpoint
+          example: https://example.com/api/data
+          format: uri
+        endpointProperties:
+          type: array
+          description: Additional properties for the endpoint
+          items:
+            $ref: '#/components/schemas/EndpointProperty'
+          example:
+            '@type': DataAddress
+            endpointType: https://w3.org/idsa/v4.1/HTTP
+            endpoint: https://example.com/api/data
+            endpointProperties:
+              - '@type': EndpointProperty
+                name: authorization
+                value: 5up3r53cur3t0k3n
+              - '@type': EndpointProperty
+                name: authType
+                value: bearer
+
+    EndpointProperty:
+      type: object
+      required:
+        - '@type'
+        - name
+        - value
+      properties:
+        '@type':
+          type: string
+          default: EndpointProperty
+        name:
+          type: string
+          description: The name of the property
+          example: authorization
+        value:
+          type: string
+          description: The value of the property
+          example: 5up3r53cur3t0k3n
+
+    TransferType:
+      type: object
+      required:
+        - destinationType
+        - flowType
+      properties:
+        destinationType:
+          type: string
+          description: The type of destination for the data transfer
+          example: com.test.http
+        flowType:
+          type: string
+          description: The type of data flow
+          enum: [ pull, push ]
+          example: pull
+
+    DataPlaneRegistrationData:
+      type: object
+      required: [dataplaneId, name, endpoint, transferTypes, authorization]
+      properties:
+        dataplaneId:
+          type: string
+          description: The unique identifier of the data plane
+          example: dataplane-64345
+        name:
+            type: string
+            description: A human-readable name for the data plane
+            example: My Data Plane
+        description:
+            type: string
+            description: A human-readable description of the data plane
+            example: This data plane is responsible for handling data transfers for project X.
+        endpoint:
+            type: string
+            description: The base URL of the data plane's Signaling API endpoint
+            example: https://dataplane.example.com/api/v1/signaling
+            format: uri
+        transferTypes:
+            type: array
+            description: A list of transfer types supported by the data plane
+            items:
+              type: string
+            example:
+              - "com.test.http-pull"
+              - "com.test.mqtt-push-com.test.mqtt"
+        authorization:
+          type: array
+          description: an array of one or more authorization objects
+          items:
+            properties:
+              type:
+                type: string
+                description: The authorization profile
+                example: "oauth2_client_credentials"
+              tokenEndpoint:
+                type: string
+                description: The token endpoint to be used for obtaining access tokens
+                example: "https://auth.example.com/oauth2/token"
+              clientId:
+                type: string
+                description: The client ID for the authorization profile
+                example: "123456789"
+              clientSecret:
+                type: string
+                description: The client secret for the authorization profile
+                example: "s3cr3t"
+        labels:
+          type: array
+          description: an array of one of more strings corresponding to labels associated with the data plane
+          items:
+            type: string
+          example:
+            - "label1"
+            - "label2"
+    
+    ControlPlaneRegistrationData:
+      type: object
+      required: [controlplaneId,name,endpoint,authorization]
+      properties:
+        controlplaneId:
+          type: string
+          description: The unique identifier of the control plane
+          example: controlplane-64345
+        name:
+          type: string
+          description: A human-readable name for the control plane
+          example: My Control Plane
+        description:
+          type: string
+          description: A human-readable description of the control plane
+          example: This control plane is the main DSP hub for company X..
+        endpoint:
+          type: string
+          description: The base URL of the control plane's Signaling API endpoint
+          example: https://dataplane.example.com/api/v1/signaling
+          format: uri
+        authorization:
+          type: array
+          description: an array of one or more authorization objects
+          items:
+            properties:
+              type:
+                type: string
+                description: The authorization profile
+                example: "oauth2_client_credentials"
+              tokenEndpoint:
+                type: string
+                description: The token endpoint to be used for obtaining access tokens
+                example: "https://auth.example.com/oauth2/token"
+              clientId:
+                type: string
+                description: The client ID for the authorization profile
+                example: "123456789"
+              clientSecret:
+                type: string
+                description: The client secret for the authorization profile
+                example: "s3cr3t"
+  requestBodies:
+    DataFlowPrepareMessage:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DataFlowPrepareMessage'
+      description: Message to let the data plane begin with preparations for a data transfer
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://petstore.swagger.io/oauth/authorize'
+          scopes:
+            'write:pets': modify pets in your account
+            'read:pets': read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
