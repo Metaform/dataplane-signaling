@@ -55,7 +55,7 @@
                 "flowType"
             ]
         },
-        "destinationDataAddress": {
+        "dataAddress": {
             "type": "object"
         }
     },
@@ -67,7 +67,6 @@
         "processId",
         "agreementId",
         "datasetId",
-        "transferType",
-        "destinationDataAddress"
+        "transferType"
     ]
 }
