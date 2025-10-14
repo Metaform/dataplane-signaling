@@ -32,11 +32,11 @@ paths:
         - Data plane endpoints
       summary: Prepare a dataflow
       description: |
-        The prepare request signals to the dat plane to initialize a data flow and any resources required for data transfer. 
-        The request results in a state machine transition to PREPARING or PREPARED. If the state machine transitions to PREPARING, the 
-        data plane returns HTTP 202 with the `Location` header set to the relative URL where the status of the data flow can be polled 
-        and a response body containing a DataFlowResponseMessage. If the state machine transitions to PREPARED, the data plane returns HTTP 200 
-        and a DataFlowResponseMessage.
+        The `prepare` request signals to the [=Data Plane=] to initialize a [=Data Flow=] and any resources required for
+        data transfer. The request results in a state machine transition to PREPARING or PREPARED. If the state machine
+        transitions to PREPARING, the [=Data Plane=] MUST return HTTP 202 Accepted with the `Location` header set to the
+        [data flow status relative URL](#status) and a message body containing a `DataFlowResponseMessage`. If the state
+        machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
       operationId: prepareDataflow
       responses:
         '200':
@@ -65,7 +65,8 @@ paths:
                 dataplaneId: dataplane-64345
                 state: PREPARING
         '400':
-          description: Bad Request - invalid input, invalid object state or missing required parameters
+          description: Bad Request - invalid input, invalid object state or missing required parameters, supplying the
+            dataAddress on consumer-pull transfers
       requestBody:
         description: Dataflow preparation request
         required: true
@@ -74,19 +75,18 @@ paths:
             schema:
               $ref: '#/components/schemas/DataFlowPrepareMessage'
 
-  /dataflows/{id}/start:
+  /dataflows/{id}/notify/started:
     post:
       tags:
         - Data plane endpoints
-      summary: Start a dataflow
+      summary: Notify a consumer data plane that a transfer has been started
       description: |
-        The start request signals to the data plane to begin a data transfer. The request results in a state machine 
-        transition to STARTING or STARTED. If the state machine transitions to STARTING, the data plane MUST return 
-        HTTP 202 Accepted with the Location header set to the data flow status relative URL and a message body containing 
-        a DataFlowResponseMessage. If the state machine transitions to STARTED, the data plane MUST return 
-        HTTP 200 OK and a DataFlowResponseMessage.
+        The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun. For pull
+        transfers this indicates the consumer [=Data Plane=] may transmit data. For push transfers this
+        indicates the provider has already begun sending data. The request results in a state machine transition to
+        STARTED and the Data Plane MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
 
-      operationId: startDataflowById
+      operationId: notifyStarted
       parameters:
         - name: id
           in: path
@@ -135,21 +135,29 @@ paths:
                   dataplaneId: dataplane-64345
                   state: STARTING
         '400':
-          description: Bad Request - invalid input, invalid object state or missing required parameters
+          description: Bad Request - invalid input, invalid object state or missing required parameters, omitting the
+            dataAddress on consumer-pull transfers or supplying a dataAddress on provider-push transfers.
         '404':
           description: Not Found - data flow with specified ID does not exist
+      requestBody:
+        description: Notify consumer data plane about started transfer. Required for consumer pull transfers.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataFlowStartedNotificationMessage'
 
   /dataflows/start:
     post:
       tags:
         - Data plane endpoints
-      summary: Start a dataflow
+      summary: Start a dataflow (provider side)
       description: |
-        The start request signals to the data plane to begin a data transfer. The request results in a state machine 
-        transition to STARTING or STARTED. If the state machine transitions to STARTING, the data plane MUST return 
-        HTTP 202 Accepted with the Location header set to the data flow status relative URL and a message body containing 
-        a DataFlowResponseMessage. If the state machine transitions to STARTED, the data plane MUST return 
-        HTTP 200 OK and a DataFlowResponseMessage.
+        The `start` request signals to the [=Data Plane=] to begin a data transfer. The request results in a state
+        machine transition to STARTING or STARTED. If the state machine transitions to STARTING, the [=Data Plane=] MUST
+        return HTTP 202 Accepted with the `Location` header set to the [data flow status relative URL](#status) and a
+        message body containing a `DataFlowResponseMessage`. If the state machine transitions to STARTED, the Data
+        Plane MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
       operationId: startDataflow
       requestBody:
         description: Dataflow start request
@@ -198,7 +206,8 @@ paths:
                   dataplaneId: dataplane-64345
                   state: STARTING
         '400':
-          description: Bad Request - invalid input, invalid object state or missing required parameters
+          description: Bad Request - invalid input, invalid object state or missing required parameters, supplying a
+            dataAddress in consumer-pull transfers or omitting the dataAddress in provider-push transfers
         '404':
           description: Not Found - data flow with specified ID does not exist
 
@@ -619,8 +628,9 @@ components:
           format: uri
         transferType:
           $ref: '#/components/schemas/TransferType'
-        destinationDataAddress:
+        dataAddress:
           $ref: '#/components/schemas/DataAddress'
+    
     DataFlowPrepareMessage:
       allOf:
         - $ref: '#/components/schemas/DataFlowBaseMessage'
@@ -630,9 +640,11 @@ components:
         - $ref: '#/components/schemas/DataFlowBaseMessage'
         - type: object
           required: [ dataFlowId ]
-          properties:
-            sourceDataAddress:
-              $ref: '#/components/schemas/DataAddress'
+
+    DataFlowStartedNotificationMessage:
+      allOf:
+        - $ref: '#/components/schemas/DataFlowBaseMessage'
+        - type: object
 
     DataFlowSuspendMessage:
       type: object
