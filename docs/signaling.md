@@ -168,12 +168,12 @@ sequenceDiagram
     pcp ->> pdp: /start
     pdp ->> pcp: /started
     pcp -->> ccp: TransferStartMessage
-    ccp ->> cdp: /notify/started (+ DataAddress)
+    ccp ->> cdp: /started (+ DataAddress)
     cdp ->> ccp: /started
     pdp --> cdp: data
     pdp ->> pcp: /completed
     pcp -->> ccp: TransferCompletionMessage
-    ccp ->> cdp: /completed ???
+    ccp ->> cdp: /completed
 ```
 
 Note the transition to the PREPARED and STARTED states may be completed synchronously and returned as part of the
@@ -203,12 +203,12 @@ sequenceDiagram
     pcp ->> pdp: /start + DataAddress
     pdp ->> pcp: /started
     pcp -->> ccp: TransferStartMessage + DataAddress
-    ccp ->> cdp: /notify/started
+    ccp ->> cdp: /started
     cdp ->> ccp: /started
     pdp --> cdp: data
     cdp ->> ccp: /completed
     ccp -->> pcp: TransferCompletionMessage
-    pcp ->> pdp: /completed ???
+    pcp ->> pdp: /completed
 ```
 
 DSP messages are shown with a dotted line.
@@ -369,17 +369,18 @@ provider and must be accessed by the provider data plane using an API Key:
 
 #### Started Notification
 
-The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun. For pull transfers this
-means, that the consumer [=Data Plane=] may now begin transmitting data, for push transfers this means, that the
-provider has already begun sending data. The request results in a state machine transition to STARTED and the [=Data
-Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
+The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun and that a [state
+transition](#data-flow-state-machine) should be triggered. For pull transfers this means, that the consumer [=Data
+Plane=] may now begin transmitting data, for push transfers this means, that the provider has already begun sending
+data. The request results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK and a
+`DataFlowResponseMessage`.
 
 This signal occurs exclusively on the consumer side.
 
 |                 |                                                                                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **HTTP Method** | `POST`                                                                                                                                                                         |
-| **URL Path**    | `/dataflows/:id/notify/started`                                                                                                                                                |
+| **URL Path**    | `/dataflows/:id/started`                                                                                                                                                       |
 | **Request**     | [`DataFlowStartedNotificationMessage`](#dataflowstartednotificationmessage)                                                                                                    |
 | **Response**    | `HTTP 200` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error`. |
 
@@ -570,7 +571,7 @@ The data plane registration object contains the following properties:
 
 |              |                                                                                                     |
 | ------------ | --------------------------------------------------------------------------------------------------- |
-| **Schema**   | [JSON Schema](./resources/TBD)                                                                      |
+| **Schema**   | [JSON Schema]()                                                                                     |
 | **Required** | - `endpoint`: The data plane signaling endpoint.                                                    |
 |              | - `transferTypes`: An array of one or more strings corresponding to supported transfer types.       |
 | **Optional** | - `authorization`: an array of one or more authorization objects .                                  |

@@ -75,7 +75,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DataFlowPrepareMessage'
 
-  /dataflows/{id}/notify/started:
+  /dataflows/{id}/started:
     post:
       tags:
         - Data plane endpoints
