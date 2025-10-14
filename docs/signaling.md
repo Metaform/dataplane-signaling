@@ -374,7 +374,7 @@ provider and must be accessed by the provider data plane using an API Key:
 #### Started Notification
 
 The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun and that a [state
-transition](#data-flow-state-machine) should be triggered. For pull transfers this means, that the consumer [=Data
+transition](#data-flow-state-machine) should be triggered. For pull transfers, this indicates the consumer [=Data
 Plane=] may transmit data. For push transfers, this indicates the provider has already started sending
 data. The request results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK and a
 `DataFlowResponseMessage`.
