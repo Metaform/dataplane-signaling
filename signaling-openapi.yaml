@@ -153,7 +153,7 @@ paths:
         - Data plane endpoints
       summary: Start a dataflow (provider side)
       description: |
-        The `start` request signals to the Data Plane to begin a data transfer. The request results in a state
+        The `start` request signals to the [=Data Plane=] to begin a data transfer. The request results in a state
         machine transition to STARTING or STARTED. If the state machine transitions to STARTING, the Data Plane MUST
         return HTTP 202 Accepted with the `Location` header set to the [data flow status relative URL](#status) and a
         message body containing a `DataFlowResponseMessage`. If the state machine transitions to STARTED, the Data
