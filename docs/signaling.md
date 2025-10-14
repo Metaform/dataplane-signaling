@@ -173,12 +173,16 @@ sequenceDiagram
     pdp --> cdp: data
     pdp ->> pcp: /completed
     pcp -->> ccp: TransferCompletionMessage
-    ccp ->> cdp: /completed
+    ccp ->> cdp: /complete
 ```
 
 Note the transition to the PREPARED and STARTED states may be completed synchronously and returned as part of the
 response to the consumer request. Or, the transitions may be completed asynchronously, and the response delivered as a
 callback.
+
+Note also, that the response signals (`/prepared`, `/started`, `/completed`) only occur in [asynchronous
+transitions](#asynchronous-transitions). Implementations that use [synchronous operations](#synchronous-operation) may
+simply return the appropriate HTTP success codes.
 
 ### Pull Protocol Messaging
 
@@ -208,7 +212,7 @@ sequenceDiagram
     pdp --> cdp: data
     cdp ->> ccp: /completed
     ccp -->> pcp: TransferCompletionMessage
-    pcp ->> pdp: /completed
+    pcp ->> pdp: /complete
 ```
 
 DSP messages are shown with a dotted line.
@@ -461,6 +465,19 @@ The following is a non-normative example of a `DataFlowTerminateMessage`:
   "reason": "Terminating data flow due to an unrecoverable error."
 }
 ```
+
+#### Completed
+
+The `complete` request signals to the [=Data Plane=] that a data transmission has completed normally. For consumer pull
+transmissions, the `complete` request is sent to the provider data plane, for provider push transmissions the `complete`
+signal is sent to the consumer data plane.
+
+|                 |                                       |
+| --------------- | ------------------------------------- |
+| **HTTP Method** | `POST`                                |
+| **URL Path**    | `/dataflows/:id/complete`             |
+| **Request**     | Empty body                            |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` |
 
 #### Status
 
