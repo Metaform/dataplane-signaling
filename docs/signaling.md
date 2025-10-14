@@ -469,7 +469,7 @@ The following is a non-normative example of a `DataFlowTerminateMessage`:
 #### Completed
 
 The `complete` request signals to the [=Data Plane=] that a data transmission has completed normally. For consumer pull
-transmissions, the `complete` request is sent to the provider data plane, for provider push transmissions the `complete`
+transmissions, the `complete` request is sent to the provider data plane. For provider push transmissions the `complete`
 signal is sent to the consumer data plane.
 
 |                 |                                       |
