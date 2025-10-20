@@ -484,16 +484,16 @@ signal is sent to the consumer data plane.
 The `status` request returns a representation of the [=Data Flow=].
 
 |                 |                                                                                                                |
-| --------------- | -------------------------------------------------------------------------------------------------------------- |
+|-----------------|----------------------------------------------------------------------------------------------------------------|
 | **HTTP Method** | `GET`                                                                                                          |
-| **URL Path**    | `/dataflows/:id`                                                                                               |
+| **URL Path**    | `/dataflows/:id/status`                                                                                        |
 | **Request**     | Empty body                                                                                                     |
-| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error` with a [`DataFlowStatusResponseMessage`](#dataflowstatusresponsemessage) |
+| **Response**    | `HTTP 200` with a [`DataFlowStatusResponseMessage`](#dataflowstatusresponsemessage) OR `HTTP 4xx Client Error` |
 
 ##### DataFlowStatusResponseMessage
 
 |              |                                                                    |
-| ------------ | ------------------------------------------------------------------ |
+|--------------|--------------------------------------------------------------------|
 | **Schema**   | [JSON Schema](./schemas/DataFlowStatusResponseMessage.schema.json) |
 | **Required** | - `dataflowId`: The unique identifier of the data flow.            |
 |              | - `state`: The current state of the data flow.                     |
