@@ -7,6 +7,9 @@
         "dataplaneId": {
             "type": "string"
         },
+        "dataFlowId": {
+            "type": "string"
+        },
         "dataAddress": {
             "type": "object",
             "properties": {
@@ -38,6 +41,7 @@
     },
     "required": [
         "dataplaneId",
+        "dataFlowId",
         "state"
     ]
 }

@@ -534,7 +534,7 @@ paths:
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
           description: Not Found - data plane with specified ID does not exist
-          
+
   /controlplanes/register:
     post:
       tags:
@@ -543,10 +543,10 @@ paths:
       description: |
         The register endpoint is hosted on the data plane, and may be used to register a control plane with the data plane.
       operationId: registerControlPlane
-      requestBody: 
+      requestBody:
         description: Control plane registration data
         required: true
-        content: 
+        content:
           application/json:
             schema:
               $ref: '#/components/schemas/ControlPlaneRegistrationData'
@@ -555,7 +555,7 @@ paths:
           description: Control plane registered successfully
         '400':
           description: Bad Request - invalid input, invalid object state or missing required parameters
-  
+
   /controlplanes/{controlplaneId}/registration:
     put:
       tags:
@@ -586,7 +586,7 @@ paths:
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
           description: Not Found - data plane with specified ID does not exist
-    
+
     delete:
       tags:
         - Control Plane Registration
@@ -606,7 +606,7 @@ paths:
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
           description: Not Found - data plane with specified ID does not exist
-    
+
 
 externalDocs:
   description: Find out more about Dataplane Signaling Protocol
@@ -655,7 +655,7 @@ components:
           $ref: '#/components/schemas/TransferType'
         dataAddress:
           $ref: '#/components/schemas/DataAddress'
-    
+
     DataFlowPrepareMessage:
       allOf:
         - $ref: '#/components/schemas/DataFlowBaseMessage'
@@ -695,6 +695,10 @@ components:
           type: string
           description: The unique identifier of the data plane
           example: dataplane-64345
+        dataFlowId:
+          type: string
+          description: The unique identifier of the data flow
+          example: dataFlow-71635
         state:
           type: string
           description: The state of the data flow. Only PREPARING and PREPARED are valid in the response to a prepare request.
@@ -702,7 +706,6 @@ components:
           example: PREPARED
         dataAddress:
           $ref: '#/components/schemas/DataAddress'
-
         error:
           type: string
           description: An error message, if any error occurred during the preparation of the data flow.
@@ -851,7 +854,7 @@ components:
           example:
             - "label1"
             - "label2"
-    
+
     ControlPlaneRegistrationData:
       type: object
       required: [controlplaneId,name,endpoint,authorization]
