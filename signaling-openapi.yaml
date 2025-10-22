@@ -30,17 +30,17 @@ paths:
     post:
       tags:
         - Data plane endpoints
-      summary: Prepare a dataflow
+      summary: Prepare a DataFlow
       description: |
         The `prepare` request signals to the [=Data Plane=] to initialize a [=Data Flow=] and any resources required for
         data transfer. The request results in a state machine transition to PREPARING or PREPARED. If the state machine
         transitions to PREPARING, the [=Data Plane=] MUST return HTTP 202 Accepted with the `Location` header set to the
         [data flow status relative URL](#status) and a message body containing a `DataFlowResponseMessage`. If the state
         machine transitions to PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
-      operationId: prepareDataflow
+      operationId: prepareDataFlow
       responses:
         '200':
-          description: Dataflow prepared successfully
+          description: DataFlow prepared successfully
           content:
             application/json:
               schema:
@@ -49,10 +49,10 @@ paths:
                 dataplaneId: dataplane-64345
                 state: PREPARED
         '202':
-          description: Request received, dataflow preparation in progress
+          description: Request received, DataFlow preparation in progress
           headers:
             Location:
-              description: URL to poll for dataflow status
+              description: URL to poll for DataFlow status
               schema:
                 type: string
                 format: uri
@@ -68,7 +68,7 @@ paths:
           description: Bad Request - invalid input, invalid object state or missing required parameters, supplying the
             dataAddress on consumer-pull transfers
       requestBody:
-        description: Dataflow preparation request
+        description: DataFlow preparation request
         required: true
         content:
           application/json:
@@ -97,7 +97,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: Dataflow started successfully
+          description: DataFlow started successfully
           content:
             application/json:
               schema:
@@ -118,7 +118,7 @@ paths:
                         name: authType
                         value: bearer
         '202':
-          description: Start request received, dataflow is being started
+          description: Start request received, DataFlow is being started
           headers:
             Location:
               description: The URL to retrieve the data flow status
@@ -151,16 +151,16 @@ paths:
     post:
       tags:
         - Data plane endpoints
-      summary: Start a dataflow (provider side)
+      summary: Start a DataFlow (provider side)
       description: |
         The `start` request signals to the [=Data Plane=] to begin a data transfer. The request results in a state
         machine transition to STARTING or STARTED. If the state machine transitions to STARTING, the [=Data Plane=] MUST
         return HTTP 202 Accepted with the `Location` header set to the [data flow status relative URL](#status) and a
         message body containing a `DataFlowResponseMessage`. If the state machine transitions to STARTED, the Data
         Plane MUST return HTTP 200 OK and a `DataFlowResponseMessage`.
-      operationId: startDataflow
+      operationId: startDataFlow
       requestBody:
-        description: Dataflow start request
+        description: DataFlow start request
         required: true
         content:
           application/json:
@@ -169,7 +169,7 @@ paths:
 
       responses:
         '200':
-          description: Dataflow started successfully
+          description: DataFlow started successfully
           content:
             application/json:
               schema:
@@ -189,7 +189,7 @@ paths:
                       name: authType
                       value: bearer
         '202':
-          description: Start request received, dataflow is being started
+          description: Start request received, DataFlow is being started
           headers:
             Location:
               description: The URL to retrieve the data flow status
@@ -215,10 +215,10 @@ paths:
     post:
       tags:
         - Data plane endpoints
-      summary: Suspend a dataflow
+      summary: Suspend a DataFlow
       description: |
         The suspend request signals to the data plane to suspend an ongoing data transfer.
-      operationId: suspendDataflowById
+      operationId: suspendDataFlowById
       requestBody:
         required: false
         content:
@@ -235,7 +235,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: Dataflow suspended successfully
+          description: DataFlow suspended successfully
         '400':
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
@@ -245,10 +245,10 @@ paths:
     post:
       tags:
         - Data plane endpoints
-      summary: Terminate a dataflow
+      summary: Terminate a DataFlow
       description: |
         The terminate request signals to the data plane to terminate an ongoing data transfer.
-      operationId: terminateDataflowById
+      operationId: terminateDataFlowById
       requestBody:
         required: false
         content:
@@ -265,7 +265,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: Dataflow terminated successfully
+          description: DataFlow terminated successfully
         '400':
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
@@ -275,10 +275,10 @@ paths:
     get:
       tags:
         - Data plane endpoints
-      summary: Get the status of a dataflow
+      summary: Get the status of a DataFlow
       description: |
         The status endpoint returns a representation of the data flow as managed by the data plane
-      operationId: getDataflowStatusById
+      operationId: getDataFlowStatusById
       parameters:
         - name: id
           in: path
@@ -289,7 +289,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: Dataflow status retrieved successfully
+          description: DataFlow status retrieved successfully
           content:
             application/json:
               schema:
@@ -320,7 +320,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: Dataflow successfully marked as completed
+          description: DataFlow successfully marked as completed
         '400':
           description: Bad Request - invalid input, invalid object state or missing required parameters
         '404':
@@ -344,7 +344,7 @@ paths:
             type: string
             example: 93a78371-7891-495e-afb5-9b11ac6b1e94
       requestBody:
-        description: Dataflow prepared notification
+        description: DataFlow prepared notification
         required: true
         content:
           application/json:
@@ -378,7 +378,7 @@ paths:
             type: string
             example: 93a78371-7891-495e-afb5-9b11ac6b1e94
       requestBody:
-        description: Dataflow started notification
+        description: DataFlow started notification
         required: true
         content:
           application/json:
@@ -412,7 +412,7 @@ paths:
             type: string
             example: 93a78371-7891-495e-afb5-9b11ac6b1e94
       requestBody:
-        description: Dataflow completed notification
+        description: DataFlow completed notification
         required: true
         content:
           application/json:
@@ -446,7 +446,7 @@ paths:
             type: string
             example: 93a78371-7891-495e-afb5-9b11ac6b1e94
       requestBody:
-        description: Dataflow terminated notification
+        description: DataFlow terminated notification
         required: true
         content:
           application/json:
@@ -709,12 +709,12 @@ components:
 
     DataFlowStatusResponseMessage:
       type: object
-      required: [ dataflowId, state ]
+      required: [ dataFlowId, state ]
       properties:
-        dataflowId:
+        dataFlowId:
           type: string
           description: The unique identifier of the data flow
-          example: dataflow-64345
+          example: DataFlow-64345
         state:
           type: string
           description: The current state of the data flow.
