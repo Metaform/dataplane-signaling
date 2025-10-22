@@ -495,14 +495,14 @@ The `status` request returns a representation of the [=Data Flow=].
 |              |                                                                    |
 |--------------|--------------------------------------------------------------------|
 | **Schema**   | [JSON Schema](./schemas/DataFlowStatusResponseMessage.schema.json) |
-| **Required** | - `dataflowId`: The unique identifier of the data flow.            |
+| **Required** | - `dataFlowId`: The unique identifier of the data flow.            |
 |              | - `state`: The current state of the data flow.                     |
 
 The following is a non-normative example of a `DataFlowStatusResponseMessage`:
 
 ```json
 {
-  "dataflowId": "dataflow-123",
+  "dataFlowId": "dataFlow-123",
   "state": "STARTED"
 }
 ```
