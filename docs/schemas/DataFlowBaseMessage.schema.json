@@ -15,7 +15,7 @@
             "type": "string",
             "description": "ID of the counterparty"
         },
-        "dataspceContext": {
+        "dataspaceContext": {
             "type": "string",
             "description": "Context identifier of the dataspace"
         },
@@ -55,15 +55,21 @@
                 "flowType"
             ]
         },
-        "dataAddress": {
+        "metadata": {
             "type": "object"
+        },
+        "labels": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         }
     },
     "required": [
         "messageId",
         "participantId",
         "counterPartyId",
-        "dataspceContext",
+        "dataspaceContext",
         "processId",
         "agreementId",
         "datasetId",

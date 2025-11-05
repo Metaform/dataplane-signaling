@@ -6,5 +6,10 @@
         {
             "$ref": "DataFlowBaseMessage.json"
         }
-    ]
+    ],
+    "properties": {
+        "dataAddress": {
+            "type": "object"
+        }
+    }
 }
