@@ -22,14 +22,14 @@ The following terms are used to describe concepts in this specification.
 ## Base Concepts
 
 The DSP Specification models consumer access to a provider dataset in the [=Control Plane=] as a [=Transfer
-Process=](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#dfn-transfer-process). The
+Process=](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#dfn-transfer-process). The
 [=Wire Protocol=] operations in the [=Data Plane=] that facilitate data exchange are modeled as a [=Data Flow=]. A
 [=Data Flow=] represents the current state of the physical data transfer.
 
 ### Data Transfer Types
 
 A [=Data Flow=] is one of two data transfer types as defined in the [DSP
-Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#data-transfer-types):
+Specification](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#data-transfer-types):
 
 | Push            | Pull              |
 | --------------- | ----------------- |
@@ -44,7 +44,7 @@ via a consumer subscriber, or a provider HTTP REST API invoked by a consumer cli
 #### Finite vs Non-Finite Data
 
 DSP further distinguishes [Finite and Non-Finite
-Data](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1-RC4/#finite-and-non-finite-data).
+Data](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#finite-and-non-finite-data).
 Finite data has a demarcated end, for example, a file or set of files. Non-Finite data has no specified end. It could be
 an ongoing event stream or an HTTP REST API.
 
@@ -277,10 +277,7 @@ The following is a non-normative example of a `DataFlowPrepareMessage`:
   "agreementId": "test-agreement-id",
   "datasetId": "asset-id",
   "callbackAddress": "https://example.com/provider/callback",
-  "transferType": {
-    "destinationType": "com.test.s3",
-    "flowtype": "PUSH"
-  },
+  "transferType": "com.test.s3-PUSH",
   "labels": ["gold", "blue"],
   "metadata": {
     "bucketName": "destinationBucket",
@@ -362,10 +359,7 @@ provider and must be accessed by the provider data plane using an API Key:
   "agreementId": "test-agreement-id",
   "datasetId": "asset-id",
   "callbackAddress": "https://example.com/provider/callback",
-  "transferType": {
-    "destinationType": "com.test.http",
-    "flowtype": "PULL"
-  },
+  "transferType": "com.test.http-PULL",
   "dataAddress": {
     "type": "https://w3id.org/idsa/v4.1/HTTP",
     "endpoint": "http://dataplane.provider.com/api/public",
@@ -613,7 +607,7 @@ The following is a non-normative example of a Data Plane registration data objec
   "name": "My Data Plane",
   "description": "My Data Plane Description",
   "endpoint": "https://example.com/signaling",
-  "transferTypes": ["com.test.http-pull"],
+  "transferTypes": ["com.test.http-PULL"],
   "authorization": [
     {
       "type": "..."
@@ -624,19 +618,6 @@ The following is a non-normative example of a Data Plane registration data objec
 ```
 
 ##### Transfer Types
-
-A non-normative transfer type scheme can be defined as follows:
-
-`[FORWARDTYPE]-[push|pull](-[RESPONSETYPE])`
-
-where:
-
-- `FORWARDTYPE` is the name of the data transfer type. the name should include a qualifier and protocol identifier in
-  the form of `[qualifier].[protocol]`, for example, `com.test.http`. The forward type is case-insensitive and must be
-  unique.
-- `PUSH` or `PULL` indicates whether the data transfer type is push or pull. The type is case-insensitive.
-- `RESPONSETYPE` is optional and indicates whether the data transfer type supports response messages. It is the same
-  format as the `FORWARDTYPE`.
 
 Please note that the standardization of the transfer types is not in the scope of this specification. Every dataspace
 can define and document their own transfer types.

@@ -37,23 +37,8 @@
             "description": "Callback URL as a string"
         },
         "transferType": {
-            "type": "object",
-            "properties": {
-                "destinationType": {
-                    "type": "string"
-                },
-                "flowType": {
-                    "type": "string",
-                    "enum": [
-                        "pull",
-                        "push"
-                    ]
-                }
-            },
-            "required": [
-                "destinationType",
-                "flowType"
-            ]
+            "type": "string",
+            "description": "the flow transfer type"
         },
         "metadata": {
             "type": "object"
