@@ -97,43 +97,7 @@ paths:
             example: flow-1234
       responses:
         '200':
-          description: DataFlow started successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataFlowResponseMessage'
-              example:
-                example:
-                  dataplaneId: dataplane-64345
-                  state: STARTED
-                  dataAddress:
-                    '@type': DataAddress
-                    endpointType: https://23id.org.idsa/v4.1/HTTP
-                    endpoint: https://example.com/api/data
-                    endpointProperties:
-                      - '@type': EndpointProperty
-                        name: authorization
-                        value: 5up3r53cur3t0k3n
-                      - '@type': EndpointProperty
-                        name: authType
-                        value: bearer
-        '202':
-          description: Start request received, DataFlow is being started
-          headers:
-            Location:
-              description: The URL to retrieve the data flow status
-              schema:
-                type: string
-                format: uri
-              example: /dataflows/flow-1234/status
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DataFlowResponseMessage'
-              example:
-                example:
-                  dataplaneId: dataplane-64345
-                  state: STARTING
+          description: Signals to a data plane that the data transmission has been started normally.
         '400':
           description: Bad Request - invalid input, invalid object state or missing required parameters, omitting the
             dataAddress on consumer-pull transfers or supplying a dataAddress on provider-push transfers.

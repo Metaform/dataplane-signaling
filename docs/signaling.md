@@ -381,17 +381,16 @@ provider and must be accessed by the provider data plane using an API Key:
 The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun and that a [state
 transition](#data-flow-state-machine) should be triggered. For pull transfers, this indicates the consumer [=Data
 Plane=] may fetch data. For push transfers, this indicates the provider has already started sending data. The request
-results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK and a
-`DataFlowResponseMessage`.
+results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK.
 
 This signal occurs exclusively on the consumer side.
 
-|                 |                                                                                                                                                                                |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **HTTP Method** | `POST`                                                                                                                                                                         |
-| **URL Path**    | `/dataflows/:id/started`                                                                                                                                                       |
-| **Request**     | [`DataFlowStartedNotificationMessage`](#dataflowstartednotificationmessage)                                                                                                    |
-| **Response**    | `HTTP 200` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 202` with a [`DataFlowResponseMessage`](#dataflowresponsemessage) OR `HTTP 4xx Client Error`. |
+|                 |                                                                             |
+|-----------------|-----------------------------------------------------------------------------|
+| **HTTP Method** | `POST`                                                                      |
+| **URL Path**    | `/dataflows/:id/started`                                                    |
+| **Request**     | [`DataFlowStartedNotificationMessage`](#dataflowstartednotificationmessage) |
+| **Response**    | `HTTP 200` OR `HTTP 4xx Client Error`.                                      |
 
 ##### DataFlowStartedNotificationMessage
 
