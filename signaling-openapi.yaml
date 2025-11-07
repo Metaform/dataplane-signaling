@@ -652,12 +652,20 @@ components:
           example: https://example.com/controlplanes/xyz/callback
           format: uri
         transferType:
+<<<<<<< HEAD
           $ref: '#/components/schemas/TransferType'
         labels:
           type: array
         metadata:
           type: object
           description: free-form object type used by the control plane to pass flow related info to the data plane
+=======
+          type: string
+          description: The flow transfer type
+          example: com.test.http-PULL
+        dataAddress:
+          $ref: '#/components/schemas/DataAddress'
+>>>>>>> 3d139fe (docs: set transfer type as string)
 
     DataFlowPrepareMessage:
       allOf:
@@ -786,22 +794,6 @@ components:
           type: string
           description: The value of the property
           example: 5up3r53cur3t0k3n
-
-    TransferType:
-      type: object
-      required:
-        - destinationType
-        - flowType
-      properties:
-        destinationType:
-          type: string
-          description: The type of destination for the data transfer
-          example: com.test.http
-        flowType:
-          type: string
-          description: The type of data flow
-          enum: [ pull, push ]
-          example: pull
 
     DataPlaneRegistrationData:
       type: object
