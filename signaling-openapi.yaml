@@ -616,7 +616,7 @@ components:
   schemas:
     DataFlowBaseMessage:
       type: object
-      required: [ messageId, participantId, counterPartyId, dataspaceContext, processId, agreementId, datasetId, callbackAddress, transferType, destinationDataAddress ]
+      required: [ messageId, participantId, counterPartyId, dataspaceContext, processId, agreementId, datasetId, callbackAddress, transferType, labels, metadata ]
       properties:
         messageId:
           type: string
@@ -653,8 +653,11 @@ components:
           format: uri
         transferType:
           $ref: '#/components/schemas/TransferType'
-        dataAddress:
-          $ref: '#/components/schemas/DataAddress'
+        labels:
+          type: array
+        metadata:
+          type: object
+          description: free-form object type used by the control plane to pass flow related info to the data plane
 
     DataFlowPrepareMessage:
       allOf:
@@ -665,11 +668,15 @@ components:
         - $ref: '#/components/schemas/DataFlowBaseMessage'
         - type: object
           required: [ dataFlowId ]
+      properties:
+        dataAddress:
+          $ref: '#/components/schemas/DataAddress'
 
     DataFlowStartedNotificationMessage:
-      allOf:
-        - $ref: '#/components/schemas/DataFlowBaseMessage'
-        - type: object
+      type: object
+      properties:
+        dataAddress:
+          $ref: '#/components/schemas/DataAddress'
 
     DataFlowSuspendMessage:
       type: object

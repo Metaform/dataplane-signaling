@@ -250,19 +250,20 @@ PREPARED, the [=Data Plane=] MUST return HTTP 200 OK and a `DataFlowResponseMess
 
 ##### DataFlowPrepareMessage
 
-|               |                                                                                                                                                                                                 |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**    | [JSON Schema](./schemas/DataFlowPrepareMessage.schema.json)                                                                                                                                     |
-| **Required**  | - `messageId`: A unique identifier for the message.                                                                                                                                             |
-|               | - `participantId`: The participant ID of the sender as specified in the Dataspace Protocol.                                                                                                     |
-|               | - `counterPartyId`: The participant ID of the counterparty as specified in the Dataspace Protocol.                                                                                              |
-|               | - `dataspaceContext`: An identifier for the dataspace context for when the data plane is used in multiple data spaces.                                                                          |
-|               | - `processId`: The transfer process ID as assigned by the control plane for correlation.                                                                                                        |
-|               | - `agreementId`: The contract agreement ID that was negotiated by the control plane.                                                                                                            |
-|               | - `datasetId`: The ID of the dataset in the DCAT Catalog which is to be transferred.                                                                                                            |
-|               | - `callbackAddress`: A URL where the control plane receives callbacks.                                                                                                                          |
-|               | - `transferType`: The type of data transfer. See [data transfer types](#data-transfer-types).                                                                                                   |
-| **Optional**: | - `dataAddress`: An object containing information about which resources must be provisioned by the consumer. Must not be present on consumer-pull transfers. See [data address](#data-address). |
+|                |                                                                                                                        |
+|----------------|------------------------------------------------------------------------------------------------------------------------|
+| **Schema**     | [JSON Schema](./schemas/DataFlowPrepareMessage.schema.json)                                                            |
+| **Required**   | - `messageId`: A unique identifier for the message.                                                                    |
+|                | - `participantId`: The participant ID of the sender as specified in the Dataspace Protocol.                            |
+|                | - `counterPartyId`: The participant ID of the counterparty as specified in the Dataspace Protocol.                     |
+|                | - `dataspaceContext`: An identifier for the dataspace context for when the data plane is used in multiple data spaces. |
+|                | - `processId`: The transfer process ID as assigned by the control plane for correlation.                               |
+|                | - `agreementId`: The contract agreement ID that was negotiated by the control plane.                                   |
+|                | - `datasetId`: The ID of the dataset in the DCAT Catalog which is to be transferred.                                   |
+|                | - `callbackAddress`: A URL where the control plane receives callbacks.                                                 |
+|                | - `transferType`: The type of data transfer. See [data transfer types](#data-transfer-types).                          |
+| **Optional**:  | - `labels`: an array of strings that represent different flavours of data flow                                         |
+|                | - `metadata`: An object containing information that could be used by the data plane during preparation.                |
 
 The following is a non-normative example of a `DataFlowPrepareMessage`:
 
@@ -280,8 +281,8 @@ The following is a non-normative example of a `DataFlowPrepareMessage`:
     "destinationType": "com.test.s3",
     "flowtype": "PUSH"
   },
-  "dataAddress": {
-    "type": "S3",
+  "labels": ["gold", "blue"],
+  "metadata": {
     "bucketName": "destinationBucket",
     "region": "westeurope",
     "...": "..."
@@ -291,14 +292,14 @@ The following is a non-normative example of a `DataFlowPrepareMessage`:
 
 ##### DataFlowResponseMessage
 
-|              |                                                                                                                            |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| **Schema**   | [JSON Schema](./schemas/DataFlowResponseMessage.schema.json)                                                               |
-| **Required** | - `dataplaneId`: The unique identifier of the data plane.                                                                  |
-|              | - `dataFlowId`: The unique identifier of the data flow.                                                                    |
-|              | - `state`: The current state of the data flow.                                                                             |
-| **Optional** | - `dataAddress`: An object containing information about where the data can be obtained. See [data address](#data-address). |
-|              | - `error`: A description of any error that occurred during processing.                                                     |
+|              |                                                                                                                                     |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| **Schema**   | [JSON Schema](./schemas/DataFlowResponseMessage.schema.json)                                                                        |
+| **Required** | - `dataplaneId`: The unique identifier of the data plane.                                                                           |
+|              | - `dataFlowId`: The unique identifier of the data flow.                                                                             |
+|              | - `state`: The current state of the data flow.                                                                                      |
+| **Optional** | - `dataAddress`: An object containing information about where the data can be obtained/provided. See [data address](#data-address). |
+|              | - `error`: A description of any error that occurred during processing.                                                              |
 
 The following is a non-normative example of a `DataFlowResponseMessage`:
 
@@ -314,7 +315,7 @@ The following is a non-normative example of a `DataFlowResponseMessage`:
 
 #### Start
 
-The `start` request signals to the [=Data Plane=] to begin a data transfer. The request results in a state machine
+The `start` request signals to the provider [=Data Plane=] to begin a data transfer. The request results in a state machine
 transition to STARTING or STARTED. If the state machine transitions to STARTING, the [=Data Plane=] MUST return HTTP 202
 Accepted with the `Location` header set to the [data flow status relative URL](#status) and a message body containing a
 `DataFlowResponseMessage`. If the state machine transitions to STARTED, the [=Data Plane=] MUST return HTTP 200 OK and a
@@ -330,7 +331,7 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 ##### DataFlowStartMessage
 
 |              |                                                                                                                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Schema**   | [JSON Schema](./schemas/DataFlowStartMessage.schema.json)                                                                                                                                   |
 | **Required** | - `messageId`: A unique identifier for the message.                                                                                                                                         |
 |              | - `participantId`: The participant ID of the sender as specified in the Dataspace Protocol.                                                                                                 |
@@ -342,6 +343,8 @@ Accepted with the `Location` header set to the [data flow status relative URL](#
 |              | - `callbackAddress`: A URL where the control plane receives callbacks.                                                                                                                      |
 |              | - `transferType`: The type of data transfer. See [data transfer types](#data-transfer-types).                                                                                               |
 | **Optional** | - `dataAddress`: An object containing information about where the provider should push data (provider push). Must be omitted on consumer pull transfers. See [data address](#data-address). |
+|              | - `labels`: an array of strings that represent different flavours of data flow                                                                                                              |
+|              | - `metadata`: An object containing information that could be used by the data plane during startup.                                                                                         |
 
 If a data flow already exists for a particular `processId` the [=Data Plane=] MUST respond with HTTP 4xx Client Error.
 For consumer pull transfers, supplying a data address with the `/start` signal MUST result in a HTTP 4xx Client Error.
@@ -369,6 +372,12 @@ provider and must be accessed by the provider data plane using an API Key:
     "authType": "bearer",
     "endpointType": "https://w3id.org/idsa/v4.1/HTTP",
     "authorization": "<AUTH_TOKEN>"
+  },
+  "labels": ["gold", "blue"],
+  "metadata": {
+    "bucketName": "sourceBucket",
+    "region": "westeurope",
+    "...": "..."
   }
 }
 ```
@@ -377,8 +386,8 @@ provider and must be accessed by the provider data plane using an API Key:
 
 The `started` request signals to the consumer [=Data Plane=] that a data transmission has begun and that a [state
 transition](#data-flow-state-machine) should be triggered. For pull transfers, this indicates the consumer [=Data
-Plane=] may transmit data. For push transfers, this indicates the provider has already started sending
-data. The request results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK and a
+Plane=] may fetch data. For push transfers, this indicates the provider has already started sending data. The request
+results in a state machine transition to STARTED and the [=Data Plane=] MUST return HTTP 200 OK and a
 `DataFlowResponseMessage`.
 
 This signal occurs exclusively on the consumer side.
@@ -393,7 +402,7 @@ This signal occurs exclusively on the consumer side.
 ##### DataFlowStartedNotificationMessage
 
 |              |                                                                                                                                                                              |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Schema**   | [JSON Schema](./schemas/DataFlowStartedNotificationMessage.schema.json)                                                                                                      |
 | **Optional** | - `dataAddress`: A [DataAddress](#data-address) that contains information about where the data can be obtained (consumer-pull). Must be omitted for provider-push transfers. |
 
@@ -616,7 +625,7 @@ The following is a non-normative example of a Data Plane registration data objec
 
 ##### Transfer Types
 
-The transfer type scheme is defined as follows:
+A non-normative transfer type scheme can be defined as follows:
 
 `[FORWARDTYPE]-[push|pull](-[RESPONSETYPE])`
 
@@ -628,6 +637,9 @@ where:
 - `PUSH` or `PULL` indicates whether the data transfer type is push or pull. The type is case-insensitive.
 - `RESPONSETYPE` is optional and indicates whether the data transfer type supports response messages. It is the same
   format as the `FORWARDTYPE`.
+
+Please note that the standardization of the transfer types is not in the scope of this specification. Every dataspace
+can define and document their own transfer types.
 
 ##### Authorization Object
 
